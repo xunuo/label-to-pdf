@@ -1,13 +1,12 @@
-from flask import Flask, jsonify
-import os
+from flask import Flask, request
 
 app = Flask(__name__)
 
-
-@app.route('/')
-def index():
-    return jsonify({"Choo Choo": "Welcome to your Flask app 🚅"})
-
+@app.route('/webhook', methods=['POST'])
+def webhook():
+    data = request.json
+    print(data)
+    return '', 200
 
 if __name__ == '__main__':
-    app.run(debug=True, port=os.getenv("PORT", default=5000))
+    app.run(port=5000)
