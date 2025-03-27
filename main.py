@@ -4,10 +4,6 @@ from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
-# Configuration
-#CLIENT_ID = 'zenday1-24326124303424474e4677613158432f7863516b58735843354a507675337045755265756d425869774a5243427276495937346854394974462e494b4328113142290386442'
-#CLIENT_SECRET = '3lVGd47JWXR5AAks4eUyoRhgG0sPRX29d7Mdf5Lq'
-
 
 # Function to get access token
 @app.get("/")
