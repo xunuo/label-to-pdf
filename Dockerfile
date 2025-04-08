@@ -12,8 +12,4 @@ FROM python:3.12.9-slim
 WORKDIR /app
 COPY --from=builder /app/.venv .venv/
 COPY . .
-# Render deploys with flask by default
-CMD ["/app/.venv/bin/flask", "run", "--host=0.0.0.0", "--port=8080"]
-
-# Use gunicorn to serve the Flask app Railway deploys with gunicorn by default
-# CMD ["/app/.venv/bin/gunicorn", "-b", "0.0.0.0:8080", "main:app"]
+CMD ["/app/.venv/bin/flask", "run", "--host=127.0.0.1", "--port=8080"]
