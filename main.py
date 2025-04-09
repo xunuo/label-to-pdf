@@ -3,6 +3,7 @@ import os
 import threading
 import json
 import websocket
+import json
 
 app = Flask(__name__)
 
@@ -43,6 +44,28 @@ def on_open(ws):
 #     except Exception as e:
 #         print(f"Error processing message: {e}")
 
+DATA_FILE = "latest_data.json"
+
+# Function to load data from the JSON file
+def load_data():
+    global latest_data
+    try:
+        with open(DATA_FILE, "r") as file:
+            latest_data = json.load(file)
+    except (FileNotFoundError, json.JSONDecodeError):
+        # If the file doesn't exist or is invalid, use the default data
+        latest_data = [{
+            "latitude": "55.752488",
+            "longitude": "12.524214",
+            "timestamp": "Cold Start"
+        }]
+
+# Function to save data to the JSON file
+def save_data():
+    with open(DATA_FILE, "w") as file:
+        json.dump(latest_data, file)
+
+# Update the on_message function to save data
 def on_message(ws, message):
     global latest_data
     try:
@@ -67,11 +90,15 @@ def on_message(ws, message):
                     if len(latest_data) > 20:
                         latest_data.pop(0)
 
+                    # Save the updated data to the file
+                    save_data()
+
                 print(f"Updated latest data: {latest_data}")
             else:
                 print("Unexpected ASCII format.")
     except Exception as e:
-        print(f"Error processing message: {e}")       
+        print(f"Error processing message: {e}")        
+        
 def on_error(ws, error):
     print(f"WebSocket error: {error}")
 
