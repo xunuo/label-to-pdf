@@ -125,6 +125,7 @@ def start_websocket():
     )
     ws.run_forever()
 
+load_data() # Load initial data from the file
 # --- Flask Routes ---
 @app.route('/')
 def index():
