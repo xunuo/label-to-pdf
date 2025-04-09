@@ -82,7 +82,7 @@ def hex_to_ascii(hex_string):
     return ''.join(chr(int(hex_string[i:i+2], 16)) for i in range(0, len(hex_string), 2))
 
 def start_websocket():
-    ws_url = "https://iotnet.teracom.dk/app?token=vnoWVQAAABFpb3RuZXQudGVyYWNvbS5ka3_idG-uatIwbfwpA-5IsDE="
+    ws_url = "wss://iotnet.teracom.dk/app?token=vnoWVQAAABFpb3RuZXQudGVyYWNvbS5ka3_idG-uatIwbfwpA-5IsDE="
     ws = websocket.WebSocketApp(
         ws_url,
         on_open=on_open,
