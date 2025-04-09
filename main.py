@@ -144,6 +144,10 @@ def get_last_data():
     # Generate an HTML table for the last 20 geolocations
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
 =======
 
 >>>>>>> Stashed changes
