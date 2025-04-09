@@ -61,7 +61,12 @@ def load_data():
         }]
 
 # Function to save data to the JSON file
+# Function to save data to the JSON file
 def save_data():
+    # Ensure the list retains only the latest 10,000 entries
+    if len(latest_data) > 10000:
+        latest_data[:] = latest_data[-10000:]  # Keep only the last 10,000 entries
+
     with open(DATA_FILE, "w") as file:
         json.dump(latest_data, file)
 
@@ -86,7 +91,7 @@ def on_message(ws, message):
                 if not latest_data or latest_data[-1] != new_entry:
                     latest_data.append(new_entry)
 
-                    # Keep only the last 20 entries
+                    # Keep only the last 20 entries in memory
                     if len(latest_data) > 20:
                         latest_data.pop(0)
 
@@ -97,8 +102,9 @@ def on_message(ws, message):
             else:
                 print("Unexpected ASCII format.")
     except Exception as e:
-        print(f"Error processing message: {e}")        
+        print(f"Error processing message: {e}")
         
+       
 def on_error(ws, error):
     print(f"WebSocket error: {error}")
 
@@ -136,6 +142,7 @@ def get_last_data():
         return jsonify({"message": "No data received yet"}), 503
 
     # Generate an HTML table for the last 20 geolocations
+    load_data()
     table_rows = ""
     for location in latest_data:
         if isinstance(location, dict) and "latitude" in location and "longitude" in location:
