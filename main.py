@@ -7,10 +7,11 @@ import websocket
 app = Flask(__name__)
 
 # Global variable to hold the latest parsed data
+global latest_data 
 latest_data = [{
-    "latitude": "55.752488",
-    "longitude": "12.524214",
-    "timestamp": "Cold Start"
+    # "latitude": "55.752488",
+    # "longitude": "12.524214",
+    # "timestamp": "Cold Start"
 }]
 
 # --- WebSocket Functions ---
@@ -43,6 +44,36 @@ def on_open(ws):
 #     except Exception as e:
 #         print(f"Error processing message: {e}")
 
+<<<<<<< Updated upstream
+=======
+DATA_FILE = "latest_data.json"
+
+# Function to load data from the JSON file
+def load_data():
+    # global latest_data
+    try:
+        with open(DATA_FILE, "r") as file:
+            latest_data = json.load(file)
+    except (FileNotFoundError, json.JSONDecodeError):
+        # If the file doesn't exist or is invalid, use the default data
+        latest_data = [{
+            "latitude": "55.752488",
+            "longitude": "12.524214",
+            "timestamp": "Cold Start"
+        }]
+
+# Function to save data to the JSON file
+# Function to save data to the JSON file
+def save_data():
+    # Ensure the list retains only the latest 10,000 entries
+    if len(latest_data) > 10000:
+        latest_data[:] = latest_data[-10000:]  # Keep only the last 10,000 entries
+
+    with open(DATA_FILE, "w") as file:
+        json.dump(latest_data, file)
+
+# Update the on_message function to save data
+>>>>>>> Stashed changes
 def on_message(ws, message):
     global latest_data
     try:
@@ -102,6 +133,8 @@ def index():
 #     if latest_data["latitude"] is None:
 #         return jsonify({"message": "No data received yet"}), 503
 #     return jsonify(latest_data)
+# Load data from the JSON file when the app starts
+load_data()
 
 @app.route('/lastdata')
 def get_last_data():
@@ -109,6 +142,10 @@ def get_last_data():
         return jsonify({"message": "No data received yet"}), 503
 
     # Generate an HTML table for the last 20 geolocations
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
     table_rows = ""
     for location in latest_data:
         if isinstance(location, dict) and "latitude" in location and "longitude" in location:
