@@ -234,5 +234,5 @@ if __name__ == '__main__':
     ws_thread.start()
 
     # Start Flask app
-    port = int(os.getenv("PORT", 8080))  # Use Render's assigned port or default to 5000
+    port = int(os.getenv("PORT", 8000))  # Use Render's assigned port or default to 5000
     app.run(debug=True, host="0.0.0.0", port=port)
