@@ -3,6 +3,7 @@ import os
 import threading
 import json
 import websocket
+import json
 
 app = Flask(__name__)
 
@@ -44,13 +45,11 @@ def on_open(ws):
 #     except Exception as e:
 #         print(f"Error processing message: {e}")
 
-<<<<<<< Updated upstream
-=======
 DATA_FILE = "latest_data.json"
 
 # Function to load data from the JSON file
 def load_data():
-    # global latest_data
+    global latest_data
     try:
         with open(DATA_FILE, "r") as file:
             latest_data = json.load(file)
@@ -73,7 +72,6 @@ def save_data():
         json.dump(latest_data, file)
 
 # Update the on_message function to save data
->>>>>>> Stashed changes
 def on_message(ws, message):
     global latest_data
     try:
@@ -94,15 +92,20 @@ def on_message(ws, message):
                 if not latest_data or latest_data[-1] != new_entry:
                     latest_data.append(new_entry)
 
-                    # Keep only the last 20 entries
+                    # Keep only the last 20 entries in memory
                     if len(latest_data) > 20:
                         latest_data.pop(0)
+
+                    # Save the updated data to the file
+                    save_data()
 
                 print(f"Updated latest data: {latest_data}")
             else:
                 print("Unexpected ASCII format.")
     except Exception as e:
-        print(f"Error processing message: {e}")       
+        print(f"Error processing message: {e}")
+        
+       
 def on_error(ws, error):
     print(f"WebSocket error: {error}")
 
@@ -134,7 +137,7 @@ def index():
 #         return jsonify({"message": "No data received yet"}), 503
 #     return jsonify(latest_data)
 # Load data from the JSON file when the app starts
-load_data()
+
 
 @app.route('/lastdata')
 def get_last_data():
@@ -142,18 +145,7 @@ def get_last_data():
         return jsonify({"message": "No data received yet"}), 503
 
     # Generate an HTML table for the last 20 geolocations
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-=======
 
->>>>>>> Stashed changes
-=======
-
->>>>>>> Stashed changes
-=======
-
->>>>>>> Stashed changes
     table_rows = ""
     for location in latest_data:
         if isinstance(location, dict) and "latitude" in location and "longitude" in location:
@@ -252,5 +244,5 @@ if __name__ == '__main__':
     ws_thread.start()
 
     # Start Flask app
-    port = int(os.getenv("PORT", 8080))  # Use Render's assigned port or default to 5000
-    app.run(debug=True, host="127.0.0.1", port=port)
+    port = int(os.getenv("PORT", 8000))  # Use Render's assigned port or default to 5000
+    app.run(debug=True, host="0.0.0.0", port=port)
