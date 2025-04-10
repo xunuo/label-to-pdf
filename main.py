@@ -126,6 +126,7 @@ def start_websocket():
     )
     ws.run_forever()
 
+load_data() # Load initial data from the file
 # --- Flask Routes ---
 @app.route('/')
 def index():
@@ -145,7 +146,7 @@ def get_last_data():
         return jsonify({"message": "No data received yet"}), 503
 
     # Generate an HTML table for the last 20 geolocations
-
+    load_data()
     table_rows = ""
     for location in latest_data:
         if isinstance(location, dict) and "latitude" in location and "longitude" in location:
