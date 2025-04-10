@@ -1,9 +1,9 @@
 from flask import Flask, jsonify
+from listener import start_websocket  # Import the WebSocket listener function
 import os
 import threading
 import json
-import websocket
-import json
+
 
 app = Flask(__name__)
 
@@ -115,16 +115,7 @@ def on_close(ws, close_status_code, close_msg):
 def hex_to_ascii(hex_string):
     return ''.join(chr(int(hex_string[i:i+2], 16)) for i in range(0, len(hex_string), 2))
 
-def start_websocket():
-    ws_url = "wss://iotnet.teracom.dk/app?token=vnoWVQAAABFpb3RuZXQudGVyYWNvbS5ka3_idG-uatIwbfwpA-5IsDE="
-    ws = websocket.WebSocketApp(
-        ws_url,
-        on_open=on_open,
-        on_message=on_message,
-        on_error=on_error,
-        on_close=on_close
-    )
-    ws.run_forever()
+
 
 load_data() # Load initial data from the file
 # --- Flask Routes ---
