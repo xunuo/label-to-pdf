@@ -1,1 +1,1 @@
-web: gunicorn main:app --bind 0.0.0.0:$PORT
+web: gunicorn -w 4 -k uvicorn.workers.UvicornWorker -b :8000 main:app
