@@ -42,7 +42,7 @@ async def get_last_data():
     # return {"message": "Test data"}
     try:
         latest_entry = redis_client.get("latest_entry")
-        history = redis_client.lrange("history", 0, 19) or []
+        history = redis_client.lrange("history", 0, 1000) or []
         
         # Combine latest entry with history
         all_data = []
@@ -62,7 +62,7 @@ async def map_view():
             return HTMLResponse("<h1>No data available</h1>", status_code=404)
         
         latest = json.loads(entry)
-        history = redis_client.lrange("history", 0, 19) or []
+        history = redis_client.lrange("history", 0, 1000) or []
         
         markers = "\n".join([
             f"""L.marker([{json.loads(h)['latitude']}, {json.loads(h)['longitude']}])

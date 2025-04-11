@@ -77,7 +77,7 @@ async def websocket_listener():
                 with redis_client.pipeline() as pipe:
                     pipe.set("latest_entry", json.dumps(entry))
                     pipe.lpush("history", json.dumps(entry))
-                    pipe.ltrim("history", 0, 19)
+                    pipe.ltrim("history", 0, 1000)
                     pipe.execute()
 
 @app.task(bind=True, max_retries=3)
