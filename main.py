@@ -39,7 +39,7 @@ async def index():
 
 @app.get("/lastdata")
 async def get_last_data():
-    return {"message": "Test data"}
+    # return {"message": "Test data"}
     try:
         latest_entry = redis_client.get("latest_entry")
         history = redis_client.lrange("history", 0, 19) or []
