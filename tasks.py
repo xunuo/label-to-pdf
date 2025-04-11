@@ -1,23 +1,44 @@
-# tasks.py (修复版)
 from celery import Celery
-import websocket
 import json
-from redis import Redis
-import time
+from redis import Redis, ConnectionError
+from redis.retry import Retry
+from redis.backoff import ExponentialBackoff
+import os
+import asyncio
+import websockets  # Using async websockets library only
+from dotenv import load_dotenv
+load_dotenv()
 
-app = Celery("tasks", broker="redis://localhost:6379/0")
-redis_client = Redis(host="localhost", port=6379, decode_responses=True)
+app = Celery('tasks', broker=os.getenv('REDIS_URL', 'redis://redis:6379/0'))
+redis_client = Redis.from_url(os.getenv('REDIS_URL', 'redis://redis:6379/0'))
+
+# app = Celery(
+#     "tasks",
+#     broker=REDIS_URL,
+#     backend=REDIS_URL,
+#     broker_transport_options={
+#         'visibility_timeout': 3600,
+#         'socket_keepalive': True
+#     }
+# )
+# # Configure resilient Redis connection
+# redis_client = Redis.from_url(
+#     REDIS_URL,
+#     decode_responses=True,
+#     socket_keepalive=True,
+#     retry_on_timeout=True,
+#     retry=Retry(ExponentialBackoff(), 3)  # Retry 3 times with exponential backoff
+# )
 
 def hex_to_ascii(hex_string):
     try:
         return bytes.fromhex(hex_string).decode('utf-8')
     except:
-        return hex_string  # 如果不是有效的hex，直接返回原数据
+        return hex_string
 
-def on_message(ws, message):
-    print("Raw message received:", message)  # 调试日志
+def process_message(message):
+    """Process and validate incoming message"""
     try:
-        # 尝试解析JSON和HEX数据
         if isinstance(message, str):
             data = json.loads(message)
             if 'data' in data:
@@ -27,52 +48,52 @@ def on_message(ws, message):
         else:
             processed = message.decode('utf-8')
         
-        # 解析坐标数据
         if ',' in processed:
             parts = [p.strip() for p in processed.split(',')]
             if len(parts) >= 3:
-                entry = {
+                return {
                     "latitude": float(parts[0]),
                     "longitude": float(parts[1]),
                     "timestamp": parts[2]
                 }
-                # 存储到Redis
-                redis_client.set("latest_entry", json.dumps(entry))
-                redis_client.lpush("history", json.dumps(entry))
-                redis_client.ltrim("history", 0, 19)  # 保留最近20条
-                print("Stored data:", entry)  # 调试日志
+        return None
     except Exception as e:
-        print("Processing error:", str(e))
+        print(f"Message processing error: {e}")
+        return None
 
-def on_error(ws, error):
-    print("WebSocket Error:", error)
-
-def on_close(ws, close_status_code, close_msg):
-    print("WebSocket Closed. Reconnecting...")
-    time.sleep(5)
-    start_websocket_task.delay()  # 自动重连
-
-def on_open(ws):
-    print("WebSocket Connected")
-    subscribe_msg = {
-        "command": "subscribe",
-        "channels": ["gps_data"]  # 替换为实际频道
-    }
-    ws.send(json.dumps(subscribe_msg))
+async def websocket_listener():
+    """Standalone async websocket handler"""
+    uri = "wss://iotnet.teracom.dk/app?token=vnoWVQAAABFpb3RuZXQudGVyYWNvbS5ka3_idG-uatIwbfwpA-5IsDE="
+    async with websockets.connect(uri) as websocket:
+        await websocket.send(json.dumps({
+            "command": "subscribe",
+            "channels": ["gps_data"]
+        }))
+        
+        while True:
+            data = await websocket.recv()
+            entry = process_message(data)  # Your existing message processor
+            if entry:
+                with redis_client.pipeline() as pipe:
+                    pipe.set("latest_entry", json.dumps(entry))
+                    pipe.lpush("history", json.dumps(entry))
+                    pipe.ltrim("history", 0, 19)
+                    pipe.execute()
 
 @app.task(bind=True, max_retries=3)
 def start_websocket_task(self):
-    ws_url = "wss://iotnet.teracom.dk/app?token=vnoWVQAAABFpb3RuZXQudGVyYWNvbS5ka3_idG-uatIwbfwpA-5IsDE="
-    print(f"Connecting to {ws_url}")
+    """Synchronous Celery task wrapper"""
     try:
-        ws = websocket.WebSocketApp(
-            ws_url,
-            on_open=on_open,
-            on_message=on_message,
-            on_error=on_error,
-            on_close=on_close
-        )
-        ws.run_forever()
-    except Exception as exc:
-        print(f"Connection failed: {exc}")
-        self.retry(countdown=5)
+        # Create new event loop for this thread
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        
+        # Run the async function to completion
+        loop.run_until_complete(websocket_listener())
+        
+    except Exception as e:
+        print(f"WebSocket task failed: {str(e)}")
+        self.retry(exc=e, countdown=5)
+    finally:
+        if 'loop' in locals():
+            loop.close()

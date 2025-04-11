@@ -4,19 +4,24 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from redis import Redis
 import json
 import os
+import websocket
 from tasks import start_websocket_task
+from dotenv import load_dotenv
+load_dotenv()
 
 app = FastAPI()
-redis_client = Redis(
-    host=os.getenv("REDIS_HOST", "localhost"),
-    port=os.getenv("REDIS_PORT", 6379),
-    decode_responses=True
+# In main.py, update Redis connection:
+redis_client = Redis.from_url(
+    os.getenv("REDIS_URL", "redis://redis:6379/0"),  # Note 'redis' hostname
+    decode_responses=True,
+    socket_connect_timeout=5,
+    retry_on_timeout=True
 )
 
 @app.on_event("startup")
 async def startup_event():
     # 初始化默认数据
-    if not redis_client.exists("latest_entry"):
+    if not redis_client.exists("latest_entry") and not redis_client.exists("history"):
         default_data = {
             "latitude": 55.752488,
             "longitude": 12.524214,
@@ -34,16 +39,18 @@ async def index():
 
 @app.get("/lastdata")
 async def get_last_data():
+    return {"message": "Test data"}
     try:
-        entry = redis_client.get("latest_entry")
-        if not entry:
-            raise HTTPException(status_code=404, detail="No data available")
-        
+        latest_entry = redis_client.get("latest_entry")
         history = redis_client.lrange("history", 0, 19) or []
-        return JSONResponse({
-            "latest": json.loads(entry),
-            "history": [json.loads(h) for h in history]
-        })
+        
+        # Combine latest entry with history
+        all_data = []
+        if latest_entry:
+            all_data.append(json.loads(latest_entry))
+        all_data.extend([json.loads(h) for h in history])
+        
+        return JSONResponse(all_data)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

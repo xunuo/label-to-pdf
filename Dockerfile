@@ -1,21 +1,17 @@
-FROM python:3.12.9 AS builder
+# Dockerfile (for both app and celery)
+FROM python:3.9
 
-ENV PYTHONUNBUFFERED=1 \
-    PYTHONDONTWRITEBYTECODE=1
 WORKDIR /app
 
+# Create virtual environment
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
 
-RUN python -m venv .venv
-COPY requirements.txt ./
-RUN .venv/bin/pip install -r requirements.txt
-FROM python:3.12.9-slim
-WORKDIR /app
-COPY --from=builder /app/.venv .venv/
+# Install dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy app files
 COPY . .
-CMD ["/app/.venv/bin/flask", "run", "--host=0.0.0.0", "--port=8000"]
-# CMD ["/app/.venv/bin/gunicorn", "-b", "0.0.0.0:8080", "main:app"]
 
-
-# Use gunicorn to serve t
-# CMD ["/app/.venv/bin/gunicorn", "-b", "0.0.0.0:8080", "main:app"]
-
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

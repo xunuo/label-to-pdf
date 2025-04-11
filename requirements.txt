@@ -1,6 +1,8 @@
 fastapi
 uvicorn
 websocket-client
-celery
+celery[redis]>=5.2.0
 redis
 websocket-client==1.6.1 
+websockets>=11.0
+python-dotenv
