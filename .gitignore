@@ -7,6 +7,7 @@
 __pycache__/
 *.py[cod]
 *$py.class
+latest_data.json
 
 # C extensions
 *.so
