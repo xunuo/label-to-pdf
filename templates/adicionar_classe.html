@@ -1,0 +1,78 @@
+{% extends "base/base.html" %}
+
+{% block title %}Adicionar Classe{% endblock %}
+
+{% block extra_head %}
+<style>
+    #popup-container {
+        position: fixed;
+        top: 1rem;
+        right: 1rem;
+        z-index: 1050;
+        max-width: 320px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1 class="mt-4">Adicionar Nova Classe</h1>
+
+<div id="popup-container"></div>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    showPopup("{{ message }}", "{{ category }}");
+                });
+            </script>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+<form method="POST" action="{{ url_for('adicionar_classe') }}" class="row g-3">
+    <div class="col-md-6">
+        <label for="classe_nome" class="form-label">Nome da Classe</label>
+        <input type="text" name="classe_nome" id="classe_nome" class="form-control" required>
+    </div>
+    <div class="col-md-2 d-flex align-items-end">
+        <button type="submit" class="btn btn-primary">Adicionar Classe</button>
+    </div>
+</form>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    function showPopup(message, category) {
+        const popupContainer = document.getElementById('popup-container');
+        if (!popupContainer) return;
+
+        const categoryMap = {
+            'error': 'danger',
+            'danger': 'danger',
+            'success': 'success',
+            'warning': 'warning',
+            'info': 'info'
+        };
+
+        const alertClass = categoryMap[category] || 'info';
+
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${alertClass} alert-dismissible fade show`;
+        alertDiv.role = 'alert';
+        alertDiv.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+
+        popupContainer.appendChild(alertDiv);
+
+        setTimeout(() => {
+            alertDiv.classList.remove('show');
+            alertDiv.classList.add('hide');
+            setTimeout(() => alertDiv.remove(), 500);
+        }, 3000);
+    }
+</script>
+{% endblock %}

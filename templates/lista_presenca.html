@@ -1,0 +1,68 @@
+{% extends "base/base.html" %}
+
+{% block title %}Histórico de Presença{% endblock %}
+
+{% block content %}
+<div class="container text-light">
+  <!-- Filtro de Classe -->
+  <h2 class="mt-4">Selecionar Classe</h2>
+  <form method="GET" action="{{ url_for('lista_presenca') }}" class="row g-3 mb-4">
+      <div class="col-md-4">
+          <label for="classe" class="form-label">Escolha uma Classe:</label>
+          <select name="classe" id="classe" class="form-select bg-dark text-light">
+              <option value="">Todas as Classes</option>
+              {% for classe in classes %}
+              <option value="{{ classe['_id'] }}" {% if classe['_id']|string == request.args.get('classe') %} selected {% endif %}>
+                  {{ classe['classe'] }}
+              </option>
+              {% endfor %}
+          </select>
+      </div>
+      <div class="col-md-2 d-flex align-items-end">
+          <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+      </div>
+  </form>
+
+  {% if registros %}
+      <h2 class="mb-4">
+        {% if request.args.get('classe') %}
+          Histórico da Classe: {{ selected_classe_nome }}
+        {% else %}
+          Todas as Presenças
+        {% endif %}
+      </h2>
+
+      <div class="table-responsive">
+        <table class="table table-dark table-striped table-bordered align-middle">
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Classe</th>
+                    <th>Aluno</th>
+                    <th>Presença</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for registro in registros|sort(attribute='data', reverse=True) %}
+                <tr>
+                    <td>{{ registro['data'].strftime('%d/%m/%Y %H:%M') }}</td>
+                    <td>{{ registro['nome_classe'] }}</td>
+                    <td>{{ registro['nome_aluno'] }}</td>
+                    <td>
+                      {% if registro.get('presenca', True) %}
+                        <span class="badge bg-success">Presente</span>
+                      {% else %}
+                        <span class="badge bg-danger">Ausente</span>
+                      {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+      </div>
+  {% else %}
+      <p class="alert alert-danger mt-4">Nenhum registro encontrado para esta classe.</p>
+  {% endif %}
+</div>
+{% endblock %}
+

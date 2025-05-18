@@ -1,0 +1,20 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Editar Classe{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Editar Classe</h2>
+
+<form method="POST">
+  <div class="mb-3">
+    <label for="classe_nome" class="form-label">Nome da Classe</label>
+    <input type="text" class="form-control" id="classe_nome" name="classe_nome" value="{{ classe.classe }}" required>
+  </div>
+  <button type="submit" class="btn btn-success">Salvar Alterações</button>
+  <button type="submit" name="apagar" class="btn btn-danger">Apagar Classe</button>
+</form>
+<p class="mt-1">
+  <a href="{{ url_for('adicionar_classe') }}" class="btn btn-secondary">Cancelar</a>
+</p>
+{% endblock %}
+

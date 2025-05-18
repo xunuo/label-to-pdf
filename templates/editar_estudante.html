@@ -1,0 +1,38 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Editar Estudante{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Editar Estudante</h2>
+
+<form method="POST">
+  <div class="mb-3">
+    <label for="name" class="form-label">Nome</label>
+    <input type="text" class="form-control" id="name" name="name" value="{{ estudante.nome }}" required>
+  </div>
+
+  <div class="mb-3">
+    <label for="email" class="form-label">E-mail</label>
+    <input type="email" class="form-control" id="email" name="email" value="{{ estudante.email }}" required>
+  </div>
+
+  <div class="mb-3">
+    <label for="age" class="form-label">Idade</label>
+    <input type="number" class="form-control" id="age" name="age" value="{{ estudante.idade }}" required>
+  </div>
+
+  <div class="mb-3">
+    <label for="classe_id" class="form-label">Classe</label>
+    <select class="form-select" id="classe_id" name="classe_id" required>
+      {% for classe in classes %}
+      <option value="{{ classe._id }}" {% if classe._id == estudante.classe_id %}selected{% endif %}>
+        {{ classe.classe }}
+      </option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <button type="submit" class="btn btn-success">Salvar Alterações</button>
+  <a href="{{ url_for('adicionar_estudante') }}" class="btn btn-secondary">Cancelar</a>
+</form>
+{% endblock %}
