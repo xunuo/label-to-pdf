@@ -1,0 +1,2020 @@
+String Art Instructions
+======================
+
+Parameters:
+- Total Nails: 200
+- Shape: circle
+- Output Size: 800px
+- String Strength: 0.1
+- Max Iterations: 2000
+- Random Nails: 100
+- White Background: False
+
+Quadrant Layout:
+- Blue: 12 o'clock (indices 150-199)
+- Red: 3 o'clock (indices 0-49)
+- Green: 6 o'clock (indices 50-99)
+- Yellow: 9 o'clock (indices 100-149)
+
+Instructions (2000 total):
+==================================================
+   1. Red 1 -> Yellow 12
+   2. Yellow 12 -> Blue 49
+   3. Blue 49 -> Yellow 9
+   4. Yellow 9 -> Blue 47
+   5. Blue 47 -> Yellow 13
+   6. Yellow 13 -> Red 3
+   7. Red 3 -> Yellow 4
+   8. Yellow 4 -> Blue 44
+   9. Blue 44 -> Yellow 7
+  10. Yellow 7 -> Blue 47
+  11. Blue 47 -> Yellow 6
+  12. Yellow 6 -> Red 7
+  13. Red 7 -> Yellow 8
+  14. Yellow 8 -> Blue 50
+  15. Blue 50 -> Green 49
+  16. Green 49 -> Blue 49
+  17. Blue 49 -> Yellow 13
+  18. Yellow 13 -> Red 30
+  19. Red 30 -> Yellow 49
+  20. Yellow 49 -> Red 45
+  21. Red 45 -> Yellow 50
+  22. Yellow 50 -> Red 46
+  23. Red 46 -> Blue 1
+  24. Blue 1 -> Red 39
+  25. Red 39 -> Yellow 48
+  26. Yellow 48 -> Red 41
+  27. Red 41 -> Blue 3
+  28. Blue 3 -> Red 50
+  29. Red 50 -> Blue 2
+  30. Blue 2 -> Red 48
+  31. Red 48 -> Blue 1
+  32. Blue 1 -> Red 38
+  33. Red 38 -> Yellow 47
+  34. Yellow 47 -> Red 42
+  35. Red 42 -> Blue 4
+  36. Blue 4 -> Red 40
+  37. Red 40 -> Yellow 47
+  38. Yellow 47 -> Red 35
+  39. Red 35 -> Yellow 49
+  40. Yellow 49 -> Red 39
+  41. Red 39 -> Yellow 46
+  42. Yellow 46 -> Red 36
+  43. Red 36 -> Yellow 48
+  44. Yellow 48 -> Red 47
+  45. Red 47 -> Yellow 49
+  46. Yellow 49 -> Red 46
+  47. Red 46 -> Blue 8
+  48. Blue 8 -> Green 22
+  49. Green 22 -> Blue 10
+  50. Blue 10 -> Green 21
+  51. Green 21 -> Blue 6
+  52. Blue 6 -> Green 8
+  53. Green 8 -> Blue 7
+  54. Blue 7 -> Green 21
+  55. Green 21 -> Blue 11
+  56. Blue 11 -> Green 24
+  57. Green 24 -> Blue 9
+  58. Blue 9 -> Green 28
+  59. Green 28 -> Blue 12
+  60. Blue 12 -> Green 20
+  61. Green 20 -> Blue 8
+  62. Blue 8 -> Green 23
+  63. Green 23 -> Blue 5
+  64. Blue 5 -> Red 44
+  65. Red 44 -> Yellow 50
+  66. Yellow 50 -> Red 41
+  67. Red 41 -> Blue 5
+  68. Blue 5 -> Green 6
+  69. Green 6 -> Blue 6
+  70. Blue 6 -> Red 39
+  71. Red 39 -> Blue 2
+  72. Blue 2 -> Green 1
+  73. Green 1 -> Blue 4
+  74. Blue 4 -> Green 21
+  75. Green 21 -> Blue 5
+  76. Blue 5 -> Red 39
+  77. Red 39 -> Blue 3
+  78. Blue 3 -> Red 43
+  79. Red 43 -> Blue 1
+  80. Blue 1 -> Green 2
+  81. Green 2 -> Blue 3
+  82. Blue 3 -> Red 37
+  83. Red 37 -> Blue 2
+  84. Blue 2 -> Red 45
+  85. Red 45 -> Yellow 46
+  86. Yellow 46 -> Red 49
+  87. Red 49 -> Yellow 48
+  88. Yellow 48 -> Green 7
+  89. Green 7 -> Yellow 50
+  90. Yellow 50 -> Red 31
+  91. Red 31 -> Blue 3
+  92. Blue 3 -> Green 18
+  93. Green 18 -> Blue 5
+  94. Blue 5 -> Green 19
+  95. Green 19 -> Blue 11
+  96. Blue 11 -> Green 25
+  97. Green 25 -> Blue 8
+  98. Blue 8 -> Red 45
+  99. Red 45 -> Blue 1
+ 100. Blue 1 -> Red 35
+ 101. Red 35 -> Yellow 17
+ 102. Yellow 17 -> Red 2
+ 103. Red 2 -> Yellow 2
+ 104. Yellow 2 -> Red 4
+ 105. Red 4 -> Yellow 5
+ 106. Yellow 5 -> Blue 45
+ 107. Blue 45 -> Yellow 10
+ 108. Yellow 10 -> Red 1
+ 109. Red 1 -> Green 48
+ 110. Green 48 -> Blue 36
+ 111. Blue 36 -> Green 31
+ 112. Green 31 -> Blue 14
+ 113. Blue 14 -> Green 28
+ 114. Green 28 -> Blue 10
+ 115. Blue 10 -> Green 20
+ 116. Green 20 -> Blue 2
+ 117. Blue 2 -> Green 3
+ 118. Green 3 -> Yellow 45
+ 119. Yellow 45 -> Red 27
+ 120. Red 27 -> Yellow 47
+ 121. Yellow 47 -> Red 48
+ 122. Red 48 -> Yellow 49
+ 123. Yellow 49 -> Red 44
+ 124. Red 44 -> Blue 9
+ 125. Blue 9 -> Green 21
+ 126. Green 21 -> Blue 2
+ 127. Blue 2 -> Red 41
+ 128. Red 41 -> Yellow 46
+ 129. Yellow 46 -> Green 3
+ 130. Green 3 -> Blue 4
+ 131. Blue 4 -> Red 35
+ 132. Red 35 -> Yellow 44
+ 133. Yellow 44 -> Red 28
+ 134. Red 28 -> Yellow 24
+ 135. Yellow 24 -> Red 31
+ 136. Red 31 -> Yellow 21
+ 137. Yellow 21 -> Red 31
+ 138. Red 31 -> Yellow 48
+ 139. Yellow 48 -> Red 46
+ 140. Red 46 -> Blue 7
+ 141. Blue 7 -> Red 41
+ 142. Red 41 -> Blue 1
+ 143. Blue 1 -> Red 27
+ 144. Red 27 -> Yellow 25
+ 145. Yellow 25 -> Red 33
+ 146. Red 33 -> Yellow 47
+ 147. Yellow 47 -> Green 2
+ 148. Green 2 -> Yellow 48
+ 149. Yellow 48 -> Red 48
+ 150. Red 48 -> Blue 10
+ 151. Blue 10 -> Green 25
+ 152. Green 25 -> Blue 13
+ 153. Blue 13 -> Green 29
+ 154. Green 29 -> Blue 23
+ 155. Blue 23 -> Green 29
+ 156. Green 29 -> Blue 15
+ 157. Blue 15 -> Green 28
+ 158. Green 28 -> Blue 11
+ 159. Blue 11 -> Red 46
+ 160. Red 46 -> Blue 5
+ 161. Blue 5 -> Red 32
+ 162. Red 32 -> Yellow 44
+ 163. Yellow 44 -> Red 25
+ 164. Red 25 -> Yellow 46
+ 165. Yellow 46 -> Green 7
+ 166. Green 7 -> Blue 7
+ 167. Blue 7 -> Red 38
+ 168. Red 38 -> Blue 6
+ 169. Blue 6 -> Green 27
+ 170. Green 27 -> Blue 25
+ 171. Blue 25 -> Green 29
+ 172. Green 29 -> Blue 7
+ 173. Blue 7 -> Red 43
+ 174. Red 43 -> Blue 10
+ 175. Blue 10 -> Red 47
+ 176. Red 47 -> Yellow 50
+ 177. Yellow 50 -> Red 28
+ 178. Red 28 -> Yellow 43
+ 179. Yellow 43 -> Red 49
+ 180. Red 49 -> Yellow 47
+ 181. Yellow 47 -> Green 6
+ 182. Green 6 -> Yellow 48
+ 183. Yellow 48 -> Red 24
+ 184. Red 24 -> Yellow 47
+ 185. Yellow 47 -> Red 37
+ 186. Red 37 -> Yellow 50
+ 187. Yellow 50 -> Red 43
+ 188. Red 43 -> Yellow 45
+ 189. Yellow 45 -> Green 1
+ 190. Green 1 -> Blue 11
+ 191. Blue 11 -> Green 23
+ 192. Green 23 -> Blue 3
+ 193. Blue 3 -> Red 36
+ 194. Red 36 -> Yellow 16
+ 195. Yellow 16 -> Red 5
+ 196. Red 5 -> Yellow 4
+ 197. Yellow 4 -> Blue 39
+ 198. Blue 39 -> Yellow 1
+ 199. Yellow 1 -> Red 3
+ 200. Red 3 -> Yellow 12
+ 201. Yellow 12 -> Blue 48
+ 202. Blue 48 -> Yellow 14
+ 203. Yellow 14 -> Red 38
+ 204. Red 38 -> Yellow 49
+ 205. Yellow 49 -> Green 5
+ 206. Green 5 -> Yellow 45
+ 207. Yellow 45 -> Red 50
+ 208. Red 50 -> Blue 4
+ 209. Blue 4 -> Green 22
+ 210. Green 22 -> Blue 30
+ 211. Blue 30 -> Green 25
+ 212. Green 25 -> Blue 27
+ 213. Blue 27 -> Green 20
+ 214. Green 20 -> Blue 13
+ 215. Blue 13 -> Green 39
+ 216. Green 39 -> Blue 17
+ 217. Blue 17 -> Green 27
+ 218. Green 27 -> Blue 8
+ 219. Blue 8 -> Red 32
+ 220. Red 32 -> Yellow 20
+ 221. Yellow 20 -> Red 35
+ 222. Red 35 -> Blue 3
+ 223. Blue 3 -> Red 47
+ 224. Red 47 -> Yellow 46
+ 225. Yellow 46 -> Red 40
+ 226. Red 40 -> Blue 8
+ 227. Blue 8 -> Red 30
+ 228. Red 30 -> Yellow 22
+ 229. Yellow 22 -> Red 29
+ 230. Red 29 -> Blue 5
+ 231. Blue 5 -> Red 34
+ 232. Red 34 -> Yellow 18
+ 233. Yellow 18 -> Blue 50
+ 234. Blue 50 -> Yellow 10
+ 235. Yellow 10 -> Red 9
+ 236. Red 9 -> Yellow 8
+ 237. Yellow 8 -> Blue 42
+ 238. Blue 42 -> Yellow 5
+ 239. Yellow 5 -> Blue 48
+ 240. Blue 48 -> Green 46
+ 241. Green 46 -> Blue 49
+ 242. Blue 49 -> Yellow 11
+ 243. Yellow 11 -> Blue 44
+ 244. Blue 44 -> Green 41
+ 245. Green 41 -> Blue 17
+ 246. Blue 17 -> Green 35
+ 247. Green 35 -> Blue 49
+ 248. Blue 49 -> Green 31
+ 249. Green 31 -> Red 1
+ 250. Red 1 -> Yellow 3
+ 251. Yellow 3 -> Blue 43
+ 252. Blue 43 -> Yellow 14
+ 253. Yellow 14 -> Blue 45
+ 254. Blue 45 -> Yellow 4
+ 255. Yellow 4 -> Red 7
+ 256. Red 7 -> Yellow 17
+ 257. Yellow 17 -> Red 33
+ 258. Red 33 -> Yellow 19
+ 259. Yellow 19 -> Red 5
+ 260. Red 5 -> Yellow 6
+ 261. Yellow 6 -> Blue 38
+ 262. Blue 38 -> Yellow 1
+ 263. Yellow 1 -> Red 4
+ 264. Red 4 -> Yellow 11
+ 265. Yellow 11 -> Red 29
+ 266. Red 29 -> Yellow 50
+ 267. Yellow 50 -> Green 19
+ 268. Green 19 -> Blue 12
+ 269. Blue 12 -> Green 23
+ 270. Green 23 -> Blue 29
+ 271. Blue 29 -> Green 31
+ 272. Green 31 -> Blue 21
+ 273. Blue 21 -> Green 3
+ 274. Green 3 -> Yellow 43
+ 275. Yellow 43 -> Red 23
+ 276. Red 23 -> Yellow 45
+ 277. Yellow 45 -> Red 48
+ 278. Red 48 -> Blue 6
+ 279. Blue 6 -> Red 43
+ 280. Red 43 -> Blue 12
+ 281. Blue 12 -> Green 22
+ 282. Green 22 -> Yellow 49
+ 283. Yellow 49 -> Green 20
+ 284. Green 20 -> Blue 4
+ 285. Blue 4 -> Red 33
+ 286. Red 33 -> Blue 9
+ 287. Blue 9 -> Red 29
+ 288. Red 29 -> Yellow 47
+ 289. Yellow 47 -> Green 7
+ 290. Green 7 -> Blue 5
+ 291. Blue 5 -> Green 27
+ 292. Green 27 -> Blue 10
+ 293. Blue 10 -> Red 34
+ 294. Red 34 -> Yellow 50
+ 295. Yellow 50 -> Red 49
+ 296. Red 49 -> Blue 5
+ 297. Blue 5 -> Red 27
+ 298. Red 27 -> Blue 3
+ 299. Blue 3 -> Green 4
+ 300. Green 4 -> Yellow 45
+ 301. Yellow 45 -> Red 42
+ 302. Red 42 -> Blue 2
+ 303. Blue 2 -> Red 28
+ 304. Red 28 -> Blue 7
+ 305. Blue 7 -> Red 33
+ 306. Red 33 -> Yellow 43
+ 307. Yellow 43 -> Green 4
+ 308. Green 4 -> Yellow 46
+ 309. Yellow 46 -> Green 8
+ 310. Green 8 -> Yellow 49
+ 311. Yellow 49 -> Red 42
+ 312. Red 42 -> Blue 11
+ 313. Blue 11 -> Red 45
+ 314. Red 45 -> Yellow 48
+ 315. Yellow 48 -> Green 1
+ 316. Green 1 -> Yellow 43
+ 317. Yellow 43 -> Red 29
+ 318. Red 29 -> Yellow 23
+ 319. Yellow 23 -> Red 29
+ 320. Red 29 -> Blue 1
+ 321. Blue 1 -> Green 18
+ 322. Green 18 -> Blue 6
+ 323. Blue 6 -> Red 44
+ 324. Red 44 -> Yellow 48
+ 325. Yellow 48 -> Green 19
+ 326. Green 19 -> Yellow 46
+ 327. Yellow 46 -> Red 37
+ 328. Red 37 -> Yellow 15
+ 329. Yellow 15 -> Blue 46
+ 330. Blue 46 -> Green 32
+ 331. Green 32 -> Blue 20
+ 332. Blue 20 -> Green 1
+ 333. Green 1 -> Blue 3
+ 334. Blue 3 -> Red 38
+ 335. Red 38 -> Blue 4
+ 336. Blue 4 -> Green 24
+ 337. Green 24 -> Blue 14
+ 338. Blue 14 -> Red 46
+ 339. Red 46 -> Yellow 37
+ 340. Yellow 37 -> Red 48
+ 341. Red 48 -> Yellow 44
+ 342. Yellow 44 -> Red 50
+ 343. Red 50 -> Blue 14
+ 344. Blue 14 -> Green 38
+ 345. Green 38 -> Red 1
+ 346. Red 1 -> Yellow 7
+ 347. Yellow 7 -> Blue 41
+ 348. Blue 41 -> Green 50
+ 349. Green 50 -> Blue 36
+ 350. Blue 36 -> Green 47
+ 351. Green 47 -> Blue 48
+ 352. Blue 48 -> Green 32
+ 353. Green 32 -> Blue 50
+ 354. Blue 50 -> Green 29
+ 355. Green 29 -> Blue 8
+ 356. Blue 8 -> Red 37
+ 357. Red 37 -> Blue 6
+ 358. Blue 6 -> Red 26
+ 359. Red 26 -> Yellow 50
+ 360. Yellow 50 -> Red 40
+ 361. Red 40 -> Blue 3
+ 362. Blue 3 -> Red 25
+ 363. Red 25 -> Yellow 41
+ 364. Yellow 41 -> Red 11
+ 365. Red 11 -> Yellow 9
+ 366. Yellow 9 -> Blue 46
+ 367. Blue 46 -> Yellow 13
+ 368. Yellow 13 -> Red 31
+ 369. Red 31 -> Blue 11
+ 370. Blue 11 -> Green 17
+ 371. Green 17 -> Blue 9
+ 372. Blue 9 -> Green 26
+ 373. Green 26 -> Blue 2
+ 374. Blue 2 -> Red 47
+ 375. Red 47 -> Yellow 34
+ 376. Yellow 34 -> Red 41
+ 377. Red 41 -> Yellow 11
+ 378. Yellow 11 -> Red 32
+ 379. Red 32 -> Blue 7
+ 380. Blue 7 -> Red 47
+ 381. Red 47 -> Yellow 47
+ 382. Yellow 47 -> Green 22
+ 383. Green 22 -> Blue 1
+ 384. Blue 1 -> Red 30
+ 385. Red 30 -> Blue 9
+ 386. Blue 9 -> Red 35
+ 387. Red 35 -> Yellow 29
+ 388. Yellow 29 -> Red 38
+ 389. Red 38 -> Yellow 50
+ 390. Yellow 50 -> Green 23
+ 391. Green 23 -> Yellow 48
+ 392. Yellow 48 -> Green 18
+ 393. Green 18 -> Blue 4
+ 394. Blue 4 -> Red 34
+ 395. Red 34 -> Blue 11
+ 396. Blue 11 -> Red 29
+ 397. Red 29 -> Blue 10
+ 398. Blue 10 -> Green 29
+ 399. Green 29 -> Blue 33
+ 400. Blue 33 -> Green 33
+ 401. Green 33 -> Blue 47
+ 402. Blue 47 -> Green 44
+ 403. Green 44 -> Blue 46
+ 404. Blue 46 -> Yellow 14
+ 405. Yellow 14 -> Red 29
+ 406. Red 29 -> Yellow 48
+ 407. Yellow 48 -> Red 22
+ 408. Red 22 -> Yellow 30
+ 409. Yellow 30 -> Red 34
+ 410. Red 34 -> Blue 7
+ 411. Blue 7 -> Green 5
+ 412. Green 5 -> Yellow 42
+ 413. Yellow 42 -> Green 2
+ 414. Green 2 -> Yellow 46
+ 415. Yellow 46 -> Red 50
+ 416. Red 50 -> Yellow 49
+ 417. Yellow 49 -> Red 41
+ 418. Red 41 -> Blue 12
+ 419. Blue 12 -> Green 40
+ 420. Green 40 -> Red 2
+ 421. Red 2 -> Green 30
+ 422. Green 30 -> Blue 50
+ 423. Blue 50 -> Yellow 11
+ 424. Yellow 11 -> Blue 42
+ 425. Blue 42 -> Green 42
+ 426. Green 42 -> Blue 16
+ 427. Blue 16 -> Red 50
+ 428. Red 50 -> Blue 10
+ 429. Blue 10 -> Red 27
+ 430. Red 27 -> Blue 8
+ 431. Blue 8 -> Green 19
+ 432. Green 19 -> Blue 2
+ 433. Blue 2 -> Green 18
+ 434. Green 18 -> Yellow 49
+ 435. Yellow 49 -> Green 26
+ 436. Green 26 -> Blue 26
+ 437. Blue 26 -> Green 20
+ 438. Green 20 -> Blue 32
+ 439. Blue 32 -> Green 34
+ 440. Green 34 -> Red 3
+ 441. Red 3 -> Yellow 3
+ 442. Yellow 3 -> Red 25
+ 443. Red 25 -> Yellow 43
+ 444. Yellow 43 -> Green 6
+ 445. Green 6 -> Blue 46
+ 446. Blue 46 -> Yellow 16
+ 447. Yellow 16 -> Red 36
+ 448. Red 36 -> Blue 2
+ 449. Blue 2 -> Red 44
+ 450. Red 44 -> Yellow 37
+ 451. Yellow 37 -> Red 15
+ 452. Red 15 -> Yellow 14
+ 453. Yellow 14 -> Blue 49
+ 454. Blue 49 -> Green 36
+ 455. Green 36 -> Blue 15
+ 456. Blue 15 -> Green 37
+ 457. Green 37 -> Blue 39
+ 458. Blue 39 -> Green 48
+ 459. Green 48 -> Blue 48
+ 460. Blue 48 -> Green 4
+ 461. Green 4 -> Blue 1
+ 462. Blue 1 -> Red 49
+ 463. Red 49 -> Blue 4
+ 464. Blue 4 -> Red 30
+ 465. Red 30 -> Yellow 8
+ 466. Yellow 8 -> Red 1
+ 467. Red 1 -> Yellow 17
+ 468. Yellow 17 -> Red 34
+ 469. Red 34 -> Blue 6
+ 470. Blue 6 -> Red 40
+ 471. Red 40 -> Yellow 31
+ 472. Yellow 31 -> Red 21
+ 473. Red 21 -> Yellow 41
+ 474. Yellow 41 -> Green 6
+ 475. Green 6 -> Yellow 44
+ 476. Yellow 44 -> Green 4
+ 477. Green 4 -> Yellow 50
+ 478. Yellow 50 -> Green 21
+ 479. Green 21 -> Blue 31
+ 480. Blue 31 -> Green 27
+ 481. Green 27 -> Yellow 49
+ 482. Yellow 49 -> Red 32
+ 483. Red 32 -> Blue 10
+ 484. Blue 10 -> Green 42
+ 485. Green 42 -> Red 4
+ 486. Red 4 -> Green 50
+ 487. Green 50 -> Blue 40
+ 488. Blue 40 -> Yellow 10
+ 489. Yellow 10 -> Red 33
+ 490. Red 33 -> Blue 12
+ 491. Blue 12 -> Red 30
+ 492. Red 30 -> Blue 7
+ 493. Blue 7 -> Green 24
+ 494. Green 24 -> Blue 28
+ 495. Blue 28 -> Green 24
+ 496. Green 24 -> Blue 43
+ 497. Blue 43 -> Green 9
+ 498. Green 9 -> Blue 24
+ 499. Blue 24 -> Green 27
+ 500. Green 27 -> Blue 1
+ 501. Blue 1 -> Red 37
+ 502. Red 37 -> Yellow 30
+ 503. Yellow 30 -> Red 44
+ 504. Red 44 -> Blue 11
+ 505. Blue 11 -> Red 27
+ 506. Red 27 -> Yellow 5
+ 507. Yellow 5 -> Red 2
+ 508. Red 2 -> Yellow 15
+ 509. Yellow 15 -> Blue 45
+ 510. Blue 45 -> Green 7
+ 511. Green 7 -> Blue 1
+ 512. Blue 1 -> Red 47
+ 513. Red 47 -> Blue 6
+ 514. Blue 6 -> Green 22
+ 515. Green 22 -> Yellow 48
+ 516. Yellow 48 -> Green 26
+ 517. Green 26 -> Blue 45
+ 518. Blue 45 -> Green 45
+ 519. Green 45 -> Blue 34
+ 520. Blue 34 -> Yellow 1
+ 521. Yellow 1 -> Red 25
+ 522. Red 25 -> Blue 4
+ 523. Blue 4 -> Red 44
+ 524. Red 44 -> Blue 14
+ 525. Blue 14 -> Green 2
+ 526. Green 2 -> Blue 50
+ 527. Blue 50 -> Yellow 9
+ 528. Yellow 9 -> Blue 40
+ 529. Blue 40 -> Green 3
+ 530. Green 3 -> Blue 49
+ 531. Blue 49 -> Green 32
+ 532. Green 32 -> Blue 7
+ 533. Blue 7 -> Red 36
+ 534. Red 36 -> Blue 11
+ 535. Blue 11 -> Green 41
+ 536. Green 41 -> Blue 43
+ 537. Blue 43 -> Yellow 7
+ 538. Yellow 7 -> Red 9
+ 539. Red 9 -> Yellow 43
+ 540. Yellow 43 -> Green 7
+ 541. Green 7 -> Blue 10
+ 542. Blue 10 -> Red 25
+ 543. Red 25 -> Yellow 6
+ 544. Yellow 6 -> Blue 39
+ 545. Blue 39 -> Green 4
+ 546. Green 4 -> Yellow 42
+ 547. Yellow 42 -> Red 20
+ 548. Red 20 -> Yellow 32
+ 549. Yellow 32 -> Red 42
+ 550. Red 42 -> Blue 5
+ 551. Blue 5 -> Green 17
+ 552. Green 17 -> Yellow 50
+ 553. Yellow 50 -> Green 11
+ 554. Green 11 -> Yellow 48
+ 555. Yellow 48 -> Green 21
+ 556. Green 21 -> Blue 12
+ 557. Blue 12 -> Red 28
+ 558. Red 28 -> Blue 9
+ 559. Blue 9 -> Red 45
+ 560. Red 45 -> Yellow 45
+ 561. Yellow 45 -> Red 39
+ 562. Red 39 -> Yellow 13
+ 563. Yellow 13 -> Red 35
+ 564. Red 35 -> Blue 8
+ 565. Blue 8 -> Green 28
+ 566. Green 28 -> Red 1
+ 567. Red 1 -> Blue 1
+ 568. Blue 1 -> Green 20
+ 569. Green 20 -> Yellow 46
+ 570. Yellow 46 -> Red 30
+ 571. Red 30 -> Yellow 27
+ 572. Yellow 27 -> Red 36
+ 573. Red 36 -> Blue 5
+ 574. Blue 5 -> Green 1
+ 575. Green 1 -> Red 1
+ 576. Red 1 -> Green 30
+ 577. Green 30 -> Blue 1
+ 578. Blue 1 -> Red 26
+ 579. Red 26 -> Yellow 5
+ 580. Yellow 5 -> Red 6
+ 581. Red 6 -> Yellow 3
+ 582. Yellow 3 -> Blue 37
+ 583. Blue 37 -> Yellow 7
+ 584. Yellow 7 -> Red 45
+ 585. Red 45 -> Yellow 29
+ 586. Yellow 29 -> Red 32
+ 587. Red 32 -> Blue 13
+ 588. Blue 13 -> Green 21
+ 589. Green 21 -> Blue 42
+ 590. Blue 42 -> Red 49
+ 591. Red 49 -> Yellow 34
+ 592. Yellow 34 -> Red 39
+ 593. Red 39 -> Yellow 47
+ 594. Yellow 47 -> Green 23
+ 595. Green 23 -> Blue 41
+ 596. Blue 41 -> Green 11
+ 597. Green 11 -> Blue 2
+ 598. Blue 2 -> Blue 50
+ 599. Blue 50 -> Green 31
+ 600. Green 31 -> Yellow 50
+ 601. Yellow 50 -> Green 1
+ 602. Green 1 -> Yellow 36
+ 603. Yellow 36 -> Red 16
+ 604. Red 16 -> Green 45
+ 605. Green 45 -> Blue 37
+ 606. Blue 37 -> Red 49
+ 607. Red 49 -> Blue 9
+ 608. Blue 9 -> Green 16
+ 609. Green 16 -> Blue 7
+ 610. Blue 7 -> Red 24
+ 611. Red 24 -> Blue 1
+ 612. Blue 1 -> Red 28
+ 613. Red 28 -> Yellow 13
+ 614. Yellow 13 -> Blue 48
+ 615. Blue 48 -> Green 35
+ 616. Green 35 -> Red 5
+ 617. Red 5 -> Green 34
+ 618. Green 34 -> Blue 18
+ 619. Blue 18 -> Green 41
+ 620. Green 41 -> Red 31
+ 621. Red 31 -> Yellow 12
+ 622. Yellow 12 -> Red 40
+ 623. Red 40 -> Yellow 43
+ 624. Yellow 43 -> Red 46
+ 625. Red 46 -> Blue 10
+ 626. Blue 10 -> Red 31
+ 627. Red 31 -> Blue 6
+ 628. Blue 6 -> Green 36
+ 629. Green 36 -> Blue 45
+ 630. Blue 45 -> Yellow 16
+ 631. Yellow 16 -> Blue 48
+ 632. Blue 48 -> Yellow 18
+ 633. Yellow 18 -> Red 36
+ 634. Red 36 -> Blue 1
+ 635. Blue 1 -> Green 26
+ 636. Green 26 -> Yellow 47
+ 637. Yellow 47 -> Green 19
+ 638. Green 19 -> Blue 33
+ 639. Blue 33 -> Green 41
+ 640. Green 41 -> Red 10
+ 641. Red 10 -> Yellow 42
+ 642. Yellow 42 -> Green 1
+ 643. Green 1 -> Yellow 44
+ 644. Yellow 44 -> Red 22
+ 645. Red 22 -> Blue 3
+ 646. Blue 3 -> Red 33
+ 647. Red 33 -> Blue 8
+ 648. Blue 8 -> Green 8
+ 649. Green 8 -> Blue 44
+ 650. Blue 44 -> Yellow 16
+ 651. Yellow 16 -> Red 8
+ 652. Red 8 -> Green 39
+ 653. Green 39 -> Blue 41
+ 654. Blue 41 -> Green 2
+ 655. Green 2 -> Yellow 40
+ 656. Yellow 40 -> Red 23
+ 657. Red 23 -> Blue 5
+ 658. Blue 5 -> Green 38
+ 659. Green 38 -> Red 32
+ 660. Red 32 -> Blue 9
+ 661. Blue 9 -> Green 43
+ 662. Green 43 -> Blue 18
+ 663. Blue 18 -> Green 38
+ 664. Green 38 -> Red 28
+ 665. Red 28 -> Yellow 8
+ 666. Yellow 8 -> Red 44
+ 667. Red 44 -> Yellow 47
+ 668. Yellow 47 -> Red 34
+ 669. Red 34 -> Blue 1
+ 670. Blue 1 -> Green 19
+ 671. Green 19 -> Blue 40
+ 672. Blue 40 -> Red 49
+ 673. Red 49 -> Blue 20
+ 674. Blue 20 -> Green 46
+ 675. Green 46 -> Red 7
+ 676. Red 7 -> Yellow 9
+ 677. Yellow 9 -> Red 43
+ 678. Red 43 -> Yellow 49
+ 679. Yellow 49 -> Red 36
+ 680. Red 36 -> Yellow 19
+ 681. Yellow 19 -> Red 2
+ 682. Red 2 -> Red 50
+ 683. Red 50 -> Blue 36
+ 684. Blue 36 -> Yellow 9
+ 685. Yellow 9 -> Blue 38
+ 686. Blue 38 -> Green 14
+ 687. Green 14 -> Blue 3
+ 688. Blue 3 -> Green 25
+ 689. Green 25 -> Yellow 47
+ 690. Yellow 47 -> Green 1
+ 691. Green 1 -> Blue 35
+ 692. Blue 35 -> Green 49
+ 693. Green 49 -> Blue 42
+ 694. Blue 42 -> Green 10
+ 695. Green 10 -> Yellow 45
+ 696. Yellow 45 -> Green 2
+ 697. Green 2 -> Yellow 39
+ 698. Yellow 39 -> Red 13
+ 699. Red 13 -> Yellow 12
+ 700. Yellow 12 -> Blue 47
+ 701. Blue 47 -> Green 5
+ 702. Green 5 -> Blue 39
+ 703. Blue 39 -> Red 38
+ 704. Red 38 -> Yellow 48
+ 705. Yellow 48 -> Red 4
+ 706. Red 4 -> Green 33
+ 707. Green 33 -> Blue 45
+ 708. Blue 45 -> Green 40
+ 709. Green 40 -> Red 32
+ 710. Red 32 -> Yellow 8
+ 711. Yellow 8 -> Blue 41
+ 712. Blue 41 -> Yellow 5
+ 713. Yellow 5 -> Red 29
+ 714. Red 29 -> Blue 12
+ 715. Blue 12 -> Green 39
+ 716. Green 39 -> Red 3
+ 717. Red 3 -> Red 49
+ 718. Red 49 -> Yellow 36
+ 719. Yellow 36 -> Red 41
+ 720. Red 41 -> Blue 6
+ 721. Blue 6 -> Red 25
+ 722. Red 25 -> Yellow 8
+ 723. Yellow 8 -> Red 10
+ 724. Red 10 -> Green 38
+ 725. Green 38 -> Red 33
+ 726. Red 33 -> Blue 6
+ 727. Blue 6 -> Green 17
+ 728. Green 17 -> Yellow 39
+ 729. Yellow 39 -> Red 21
+ 730. Red 21 -> Yellow 48
+ 731. Yellow 48 -> Green 28
+ 732. Green 28 -> Blue 24
+ 733. Blue 24 -> Green 8
+ 734. Green 8 -> Blue 4
+ 735. Blue 4 -> Red 37
+ 736. Red 37 -> Yellow 16
+ 737. Yellow 16 -> Red 3
+ 738. Red 3 -> Yellow 14
+ 739. Yellow 14 -> Blue 42
+ 740. Blue 42 -> Green 1
+ 741. Green 1 -> Blue 1
+ 742. Blue 1 -> Green 35
+ 743. Green 35 -> Blue 3
+ 744. Blue 3 -> Red 46
+ 745. Red 46 -> Blue 15
+ 746. Blue 15 -> Green 19
+ 747. Green 19 -> Blue 3
+ 748. Blue 3 -> Green 24
+ 749. Green 24 -> Blue 31
+ 750. Blue 31 -> Green 35
+ 751. Green 35 -> Red 25
+ 752. Red 25 -> Blue 11
+ 753. Blue 11 -> Red 30
+ 754. Red 30 -> Green 44
+ 755. Green 44 -> Blue 16
+ 756. Blue 16 -> Green 40
+ 757. Green 40 -> Blue 11
+ 758. Blue 11 -> Red 26
+ 759. Red 26 -> Yellow 26
+ 760. Yellow 26 -> Red 31
+ 761. Red 31 -> Green 43
+ 762. Green 43 -> Blue 35
+ 763. Blue 35 -> Green 32
+ 764. Green 32 -> Red 24
+ 765. Red 24 -> Yellow 2
+ 766. Yellow 2 -> Red 50
+ 767. Red 50 -> Blue 39
+ 768. Blue 39 -> Red 41
+ 769. Red 41 -> Blue 42
+ 770. Blue 42 -> Red 38
+ 771. Red 38 -> Yellow 21
+ 772. Yellow 21 -> Blue 50
+ 773. Blue 50 -> Green 47
+ 774. Green 47 -> Blue 37
+ 775. Blue 37 -> Red 48
+ 776. Red 48 -> Yellow 4
+ 777. Yellow 4 -> Blue 47
+ 778. Blue 47 -> Blue 5
+ 779. Blue 5 -> Green 47
+ 780. Green 47 -> Red 18
+ 781. Red 18 -> Blue 7
+ 782. Blue 7 -> Red 29
+ 783. Red 29 -> Green 36
+ 784. Green 36 -> Blue 16
+ 785. Blue 16 -> Green 28
+ 786. Green 28 -> Blue 5
+ 787. Blue 5 -> Red 35
+ 788. Red 35 -> Green 37
+ 789. Green 37 -> Red 34
+ 790. Red 34 -> Blue 2
+ 791. Blue 2 -> Green 34
+ 792. Green 34 -> Blue 30
+ 793. Blue 30 -> Green 26
+ 794. Green 26 -> Blue 18
+ 795. Blue 18 -> Green 9
+ 796. Green 9 -> Blue 23
+ 797. Blue 23 -> Green 3
+ 798. Green 3 -> Yellow 38
+ 799. Yellow 38 -> Red 12
+ 800. Red 12 -> Green 42
+ 801. Green 42 -> Red 28
+ 802. Red 28 -> Blue 10
+ 803. Blue 10 -> Red 23
+ 804. Red 23 -> Blue 8
+ 805. Blue 8 -> Green 44
+ 806. Green 44 -> Red 5
+ 807. Red 5 -> Yellow 47
+ 808. Yellow 47 -> Blue 47
+ 809. Blue 47 -> Green 25
+ 810. Green 25 -> Yellow 48
+ 811. Yellow 48 -> Green 8
+ 812. Green 8 -> Blue 26
+ 813. Blue 26 -> Red 36
+ 814. Red 36 -> Yellow 31
+ 815. Yellow 31 -> Red 43
+ 816. Red 43 -> Blue 41
+ 817. Blue 41 -> Red 48
+ 818. Red 48 -> Red 4
+ 819. Red 4 -> Yellow 7
+ 820. Yellow 7 -> Red 31
+ 821. Red 31 -> Green 39
+ 822. Green 39 -> Blue 4
+ 823. Blue 4 -> Green 48
+ 824. Green 48 -> Blue 35
+ 825. Blue 35 -> Yellow 2
+ 826. Yellow 2 -> Red 37
+ 827. Red 37 -> Blue 43
+ 828. Blue 43 -> Yellow 41
+ 829. Yellow 41 -> Green 7
+ 830. Green 7 -> Blue 9
+ 831. Blue 9 -> Red 24
+ 832. Red 24 -> Green 39
+ 833. Green 39 -> Red 27
+ 834. Red 27 -> Blue 4
+ 835. Blue 4 -> Blue 48
+ 836. Blue 48 -> Green 50
+ 837. Green 50 -> Red 26
+ 838. Red 26 -> Blue 7
+ 839. Blue 7 -> Green 20
+ 840. Green 20 -> Yellow 42
+ 841. Yellow 42 -> Red 36
+ 842. Red 36 -> Green 36
+ 843. Green 36 -> Blue 10
+ 844. Blue 10 -> Red 33
+ 845. Red 33 -> Yellow 48
+ 846. Yellow 48 -> Red 42
+ 847. Red 42 -> Yellow 10
+ 848. Yellow 10 -> Blue 37
+ 849. Blue 37 -> Green 15
+ 850. Green 15 -> Yellow 36
+ 851. Yellow 36 -> Green 7
+ 852. Green 7 -> Yellow 40
+ 853. Yellow 40 -> Green 17
+ 854. Green 17 -> Yellow 37
+ 855. Yellow 37 -> Red 47
+ 856. Red 47 -> Blue 32
+ 857. Blue 32 -> Red 41
+ 858. Red 41 -> Blue 38
+ 859. Blue 38 -> Red 39
+ 860. Red 39 -> Yellow 50
+ 861. Yellow 50 -> Red 2
+ 862. Red 2 -> Yellow 9
+ 863. Yellow 9 -> Red 26
+ 864. Red 26 -> Blue 3
+ 865. Blue 3 -> Blue 50
+ 866. Blue 50 -> Green 4
+ 867. Green 4 -> Blue 5
+ 868. Blue 5 -> Red 45
+ 869. Red 45 -> Yellow 47
+ 870. Yellow 47 -> Green 28
+ 871. Green 28 -> Red 2
+ 872. Red 2 -> Blue 3
+ 873. Blue 3 -> Red 32
+ 874. Red 32 -> Green 34
+ 875. Green 34 -> Blue 5
+ 876. Blue 5 -> Red 48
+ 877. Red 48 -> Yellow 46
+ 878. Yellow 46 -> Green 22
+ 879. Green 22 -> Blue 5
+ 880. Blue 5 -> Red 14
+ 881. Red 14 -> Green 43
+ 882. Green 43 -> Red 33
+ 883. Red 33 -> Blue 39
+ 884. Blue 39 -> Green 13
+ 885. Green 13 -> Blue 5
+ 886. Blue 5 -> Green 37
+ 887. Green 37 -> Blue 1
+ 888. Blue 1 -> Green 23
+ 889. Green 23 -> Blue 44
+ 890. Blue 44 -> Yellow 48
+ 891. Yellow 48 -> Blue 46
+ 892. Blue 46 -> Yellow 19
+ 893. Yellow 19 -> Red 39
+ 894. Red 39 -> Blue 40
+ 895. Blue 40 -> Red 36
+ 896. Red 36 -> Green 41
+ 897. Green 41 -> Red 30
+ 898. Red 30 -> Yellow 50
+ 899. Yellow 50 -> Red 35
+ 900. Red 35 -> Yellow 28
+ 901. Yellow 28 -> Red 39
+ 902. Red 39 -> Yellow 16
+ 903. Yellow 16 -> Green 2
+ 904. Green 2 -> Blue 35
+ 905. Blue 35 -> Yellow 35
+ 906. Yellow 35 -> Red 48
+ 907. Red 48 -> Blue 44
+ 908. Blue 44 -> Yellow 17
+ 909. Yellow 17 -> Green 1
+ 910. Green 1 -> Blue 37
+ 911. Blue 37 -> Green 30
+ 912. Green 30 -> Blue 22
+ 913. Blue 22 -> Green 1
+ 914. Green 1 -> Yellow 1
+ 915. Yellow 1 -> Blue 36
+ 916. Blue 36 -> Red 31
+ 917. Red 31 -> Green 35
+ 918. Green 35 -> Red 37
+ 919. Red 37 -> Blue 5
+ 920. Blue 5 -> Red 22
+ 921. Red 22 -> Blue 9
+ 922. Blue 9 -> Green 18
+ 923. Green 18 -> Yellow 36
+ 924. Yellow 36 -> Red 10
+ 925. Red 10 -> Yellow 10
+ 926. Yellow 10 -> Red 12
+ 927. Red 12 -> Green 6
+ 928. Green 6 -> Yellow 49
+ 929. Yellow 49 -> Red 3
+ 930. Red 3 -> Yellow 11
+ 931. Yellow 11 -> Blue 39
+ 932. Blue 39 -> Yellow 42
+ 933. Yellow 42 -> Green 9
+ 934. Green 9 -> Red 5
+ 935. Red 5 -> Yellow 13
+ 936. Yellow 13 -> Red 50
+ 937. Red 50 -> Yellow 33
+ 938. Yellow 33 -> Red 19
+ 939. Red 19 -> Green 46
+ 940. Green 46 -> Red 35
+ 941. Red 35 -> Blue 42
+ 942. Blue 42 -> Yellow 38
+ 943. Yellow 38 -> Green 19
+ 944. Green 19 -> Red 24
+ 945. Red 24 -> Blue 12
+ 946. Blue 12 -> Red 42
+ 947. Red 42 -> Yellow 27
+ 948. Yellow 27 -> Blue 30
+ 949. Blue 30 -> Green 30
+ 950. Green 30 -> Yellow 48
+ 951. Yellow 48 -> Red 43
+ 952. Red 43 -> Blue 33
+ 953. Blue 33 -> Yellow 2
+ 954. Yellow 2 -> Red 6
+ 955. Red 6 -> Red 46
+ 956. Red 46 -> Yellow 47
+ 957. Yellow 47 -> Green 31
+ 958. Green 31 -> Red 26
+ 959. Red 26 -> Yellow 2
+ 960. Yellow 2 -> Blue 44
+ 961. Blue 44 -> Red 34
+ 962. Red 34 -> Blue 9
+ 963. Blue 9 -> Red 31
+ 964. Red 31 -> Blue 14
+ 965. Blue 14 -> Green 42
+ 966. Green 42 -> Red 35
+ 967. Red 35 -> Blue 36
+ 968. Blue 36 -> Green 5
+ 969. Green 5 -> Red 13
+ 970. Red 13 -> Blue 30
+ 971. Blue 30 -> Red 43
+ 972. Red 43 -> Blue 39
+ 973. Blue 39 -> Yellow 39
+ 974. Yellow 39 -> Red 11
+ 975. Red 11 -> Yellow 12
+ 976. Yellow 12 -> Green 1
+ 977. Green 1 -> Red 1
+ 978. Red 1 -> Yellow 20
+ 979. Yellow 20 -> Green 10
+ 980. Green 10 -> Yellow 46
+ 981. Yellow 46 -> Green 26
+ 982. Green 26 -> Yellow 50
+ 983. Yellow 50 -> Blue 45
+ 984. Blue 45 -> Yellow 43
+ 985. Yellow 43 -> Green 2
+ 986. Green 2 -> Green 50
+ 987. Green 50 -> Red 39
+ 988. Red 39 -> Blue 46
+ 989. Blue 46 -> Green 10
+ 990. Green 10 -> Red 17
+ 991. Red 17 -> Yellow 17
+ 992. Yellow 17 -> Red 6
+ 993. Red 6 -> Green 33
+ 994. Green 33 -> Blue 19
+ 995. Blue 19 -> Green 42
+ 996. Green 42 -> Red 5
+ 997. Red 5 -> Red 47
+ 998. Red 47 -> Yellow 5
+ 999. Yellow 5 -> Blue 34
+1000. Blue 34 -> Red 15
+1001. Red 15 -> Yellow 38
+1002. Yellow 38 -> Red 14
+1003. Red 14 -> Green 41
+1004. Green 41 -> Red 38
+1005. Red 38 -> Green 33
+1006. Green 33 -> Red 34
+1007. Red 34 -> Yellow 15
+1008. Yellow 15 -> Green 3
+1009. Green 3 -> Blue 19
+1010. Blue 19 -> Green 8
+1011. Green 8 -> Red 18
+1012. Red 18 -> Green 49
+1013. Green 49 -> Red 2
+1014. Red 2 -> Green 10
+1015. Green 10 -> Blue 23
+1016. Blue 23 -> Red 49
+1017. Red 49 -> Yellow 3
+1018. Yellow 3 -> Blue 8
+1019. Blue 8 -> Yellow 6
+1020. Yellow 6 -> Blue 10
+1021. Blue 10 -> Green 24
+1022. Green 24 -> Yellow 42
+1023. Yellow 42 -> Blue 41
+1024. Blue 41 -> Yellow 39
+1025. Yellow 39 -> Red 9
+1026. Red 9 -> Yellow 19
+1027. Yellow 19 -> Blue 49
+1028. Blue 49 -> Blue 3
+1029. Blue 3 -> Green 15
+1030. Green 15 -> Yellow 31
+1031. Yellow 31 -> Blue 33
+1032. Blue 33 -> Red 16
+1033. Red 16 -> Green 9
+1034. Green 9 -> Blue 7
+1035. Blue 7 -> Red 37
+1036. Red 37 -> Blue 39
+1037. Blue 39 -> Green 47
+1038. Green 47 -> Blue 46
+1039. Blue 46 -> Yellow 49
+1040. Yellow 49 -> Green 42
+1041. Green 42 -> Red 27
+1042. Red 27 -> Yellow 9
+1043. Yellow 9 -> Blue 10
+1044. Blue 10 -> Red 30
+1045. Red 30 -> Blue 40
+1046. Blue 40 -> Yellow 43
+1047. Yellow 43 -> Blue 38
+1048. Blue 38 -> Red 44
+1049. Red 44 -> Red 8
+1050. Red 8 -> Yellow 44
+1051. Yellow 44 -> Green 27
+1052. Green 27 -> Blue 43
+1053. Blue 43 -> Red 40
+1054. Red 40 -> Blue 7
+1055. Blue 7 -> Yellow 7
+1056. Yellow 7 -> Red 46
+1057. Red 46 -> Yellow 6
+1058. Yellow 6 -> Red 36
+1059. Red 36 -> Green 37
+1060. Green 37 -> Yellow 47
+1061. Yellow 47 -> Green 17
+1062. Green 17 -> Blue 3
+1063. Blue 3 -> Green 22
+1064. Green 22 -> Red 22
+1065. Red 22 -> Green 12
+1066. Green 12 -> Red 8
+1067. Red 8 -> Yellow 20
+1068. Yellow 20 -> Blue 47
+1069. Blue 47 -> Red 37
+1070. Red 37 -> Yellow 5
+1071. Yellow 5 -> Red 8
+1072. Red 8 -> Green 45
+1073. Green 45 -> Blue 49
+1074. Blue 49 -> Yellow 47
+1075. Yellow 47 -> Red 50
+1076. Red 50 -> Blue 38
+1077. Blue 38 -> Yellow 2
+1078. Yellow 2 -> Red 27
+1079. Red 27 -> Yellow 14
+1080. Yellow 14 -> Red 2
+1081. Red 2 -> Blue 2
+1082. Blue 2 -> Green 36
+1083. Green 36 -> Yellow 48
+1084. Yellow 48 -> Red 37
+1085. Red 37 -> Blue 25
+1086. Blue 25 -> Green 8
+1087. Green 8 -> Red 20
+1088. Red 20 -> Green 19
+1089. Green 19 -> Blue 28
+1090. Blue 28 -> Yellow 25
+1091. Yellow 25 -> Green 2
+1092. Green 2 -> Blue 34
+1093. Blue 34 -> Red 13
+1094. Red 13 -> Green 44
+1095. Green 44 -> Red 27
+1096. Red 27 -> Green 16
+1097. Green 16 -> Blue 11
+1098. Blue 11 -> Red 24
+1099. Red 24 -> Green 36
+1100. Green 36 -> Yellow 50
+1101. Yellow 50 -> Blue 43
+1102. Blue 43 -> Yellow 38
+1103. Yellow 38 -> Red 45
+1104. Red 45 -> Red 7
+1105. Red 7 -> Yellow 45
+1106. Yellow 45 -> Blue 47
+1107. Blue 47 -> Yellow 14
+1108. Yellow 14 -> Green 10
+1109. Green 10 -> Red 9
+1110. Red 9 -> Green 38
+1111. Green 38 -> Red 39
+1112. Red 39 -> Blue 44
+1113. Blue 44 -> Red 36
+1114. Red 36 -> Yellow 11
+1115. Yellow 11 -> Blue 13
+1116. Blue 13 -> Green 1
+1117. Green 1 -> Blue 47
+1118. Blue 47 -> Red 35
+1119. Red 35 -> Green 32
+1120. Green 32 -> Blue 3
+1121. Blue 3 -> Green 49
+1122. Green 49 -> Blue 38
+1123. Blue 38 -> Green 5
+1124. Green 5 -> Red 17
+1125. Red 17 -> Blue 31
+1126. Blue 31 -> Red 42
+1127. Red 42 -> Red 10
+1128. Red 10 -> Blue 31
+1129. Blue 31 -> Yellow 29
+1130. Yellow 29 -> Red 4
+1131. Red 4 -> Blue 6
+1132. Blue 6 -> Blue 49
+1133. Blue 49 -> Yellow 22
+1134. Yellow 22 -> Green 12
+1135. Green 12 -> Yellow 18
+1136. Yellow 18 -> Red 1
+1137. Red 1 -> Yellow 15
+1138. Yellow 15 -> Blue 16
+1139. Blue 16 -> Green 18
+1140. Green 18 -> Red 25
+1141. Red 25 -> Green 11
+1142. Green 11 -> Red 16
+1143. Red 16 -> Yellow 16
+1144. Yellow 16 -> Green 13
+1145. Green 13 -> Yellow 29
+1146. Yellow 29 -> Blue 32
+1147. Blue 32 -> Yellow 33
+1148. Yellow 33 -> Red 47
+1149. Red 47 -> Blue 21
+1150. Blue 21 -> Green 45
+1151. Green 45 -> Blue 16
+1152. Blue 16 -> Green 35
+1153. Green 35 -> Red 39
+1154. Red 39 -> Green 32
+1155. Green 32 -> Blue 34
+1156. Blue 34 -> Yellow 4
+1157. Yellow 4 -> Red 39
+1158. Red 39 -> Green 40
+1159. Green 40 -> Blue 19
+1160. Blue 19 -> Yellow 18
+1161. Yellow 18 -> Red 32
+1162. Red 32 -> Blue 6
+1163. Blue 6 -> Blue 46
+1164. Blue 46 -> Red 36
+1165. Red 36 -> Blue 35
+1166. Blue 35 -> Red 12
+1167. Red 12 -> Yellow 40
+1168. Yellow 40 -> Blue 38
+1169. Blue 38 -> Red 48
+1170. Red 48 -> Yellow 15
+1171. Yellow 15 -> Green 14
+1172. Green 14 -> Red 13
+1173. Red 13 -> Yellow 13
+1174. Yellow 13 -> Green 4
+1175. Green 4 -> Red 18
+1176. Red 18 -> Green 44
+1177. Green 44 -> Blue 17
+1178. Blue 17 -> Green 3
+1179. Green 3 -> Yellow 35
+1180. Yellow 35 -> Green 19
+1181. Green 19 -> Blue 42
+1182. Blue 42 -> Red 42
+1183. Red 42 -> Blue 29
+1184. Blue 29 -> Red 11
+1185. Red 11 -> Red 41
+1186. Red 41 -> Green 31
+1187. Green 31 -> Blue 7
+1188. Blue 7 -> Blue 45
+1189. Blue 45 -> Red 31
+1190. Red 31 -> Green 19
+1191. Green 19 -> Yellow 39
+1192. Yellow 39 -> Green 22
+1193. Green 22 -> Blue 9
+1194. Blue 9 -> Red 26
+1195. Red 26 -> Green 10
+1196. Green 10 -> Red 4
+1197. Red 4 -> Yellow 14
+1198. Yellow 14 -> Blue 17
+1199. Blue 17 -> Red 49
+1200. Red 49 -> Yellow 14
+1201. Yellow 14 -> Green 15
+1202. Green 15 -> Blue 25
+1203. Blue 25 -> Yellow 22
+1204. Yellow 22 -> Green 9
+1205. Green 9 -> Yellow 40
+1206. Yellow 40 -> Blue 36
+1207. Blue 36 -> Red 28
+1208. Red 28 -> Blue 3
+1209. Blue 3 -> Red 49
+1210. Red 49 -> Blue 43
+1211. Blue 43 -> Yellow 37
+1212. Yellow 37 -> Green 21
+1213. Green 21 -> Red 24
+1214. Red 24 -> Yellow 3
+1215. Yellow 3 -> Blue 5
+1216. Blue 5 -> Blue 50
+1217. Blue 50 -> Red 36
+1218. Red 36 -> Green 39
+1219. Green 39 -> Yellow 47
+1220. Yellow 47 -> Green 20
+1221. Green 20 -> Blue 11
+1222. Blue 11 -> Yellow 5
+1223. Yellow 5 -> Blue 33
+1224. Blue 33 -> Red 14
+1225. Red 14 -> Green 19
+1226. Green 19 -> Blue 14
+1227. Blue 14 -> Green 43
+1228. Green 43 -> Red 35
+1229. Red 35 -> Yellow 24
+1230. Yellow 24 -> Green 1
+1231. Green 1 -> Blue 15
+1232. Blue 15 -> Yellow 16
+1233. Yellow 16 -> Blue 50
+1234. Blue 50 -> Red 35
+1235. Red 35 -> Red 2
+1236. Red 2 -> Green 29
+1237. Green 29 -> Yellow 49
+1238. Yellow 49 -> Blue 50
+1239. Blue 50 -> Green 11
+1240. Green 11 -> Yellow 12
+1241. Yellow 12 -> Red 35
+1242. Red 35 -> Yellow 45
+1243. Yellow 45 -> Blue 41
+1244. Blue 41 -> Yellow 12
+1245. Yellow 12 -> Red 6
+1246. Red 6 -> Yellow 7
+1247. Yellow 7 -> Red 10
+1248. Red 10 -> Blue 33
+1249. Blue 33 -> Red 40
+1250. Red 40 -> Red 12
+1251. Red 12 -> Blue 31
+1252. Blue 31 -> Red 15
+1253. Red 15 -> Green 13
+1254. Green 13 -> Red 25
+1255. Red 25 -> Yellow 10
+1256. Yellow 10 -> Green 3
+1257. Green 3 -> Green 48
+1258. Green 48 -> Green 4
+1259. Green 4 -> Blue 21
+1260. Blue 21 -> Red 48
+1261. Red 48 -> Yellow 32
+1262. Yellow 32 -> Blue 32
+1263. Blue 32 -> Red 7
+1264. Red 7 -> Yellow 21
+1265. Yellow 21 -> Blue 23
+1266. Blue 23 -> Yellow 23
+1267. Yellow 23 -> Green 10
+1268. Green 10 -> Blue 20
+1269. Blue 20 -> Green 29
+1270. Green 29 -> Red 36
+1271. Red 36 -> Green 42
+1272. Green 42 -> Red 29
+1273. Red 29 -> Blue 41
+1274. Blue 41 -> Red 36
+1275. Red 36 -> Green 25
+1276. Green 25 -> Blue 7
+1277. Blue 7 -> Red 21
+1278. Red 21 -> Blue 10
+1279. Blue 10 -> Yellow 11
+1280. Yellow 11 -> Green 2
+1281. Green 2 -> Blue 9
+1282. Blue 9 -> Yellow 12
+1283. Yellow 12 -> Blue 37
+1284. Blue 37 -> Yellow 39
+1285. Yellow 39 -> Blue 42
+1286. Blue 42 -> Blue 1
+1287. Blue 1 -> Green 45
+1288. Green 45 -> Green 7
+1289. Green 7 -> Blue 26
+1290. Blue 26 -> Green 48
+1291. Green 48 -> Red 31
+1292. Red 31 -> Blue 39
+1293. Blue 39 -> Red 40
+1294. Red 40 -> Green 31
+1295. Green 31 -> Blue 35
+1296. Blue 35 -> Red 11
+1297. Red 11 -> Blue 3
+1298. Blue 3 -> Red 1
+1299. Red 1 -> Red 34
+1300. Red 34 -> Green 47
+1301. Green 47 -> Green 5
+1302. Green 5 -> Blue 5
+1303. Blue 5 -> Yellow 7
+1304. Yellow 7 -> Red 33
+1305. Red 33 -> Yellow 28
+1306. Yellow 28 -> Red 29
+1307. Red 29 -> Green 15
+1308. Green 15 -> Yellow 21
+1309. Yellow 21 -> Red 49
+1310. Red 49 -> Blue 34
+1311. Blue 34 -> Red 8
+1312. Red 8 -> Yellow 11
+1313. Yellow 11 -> Green 17
+1314. Green 17 -> Yellow 41
+1315. Yellow 41 -> Red 23
+1316. Red 23 -> Blue 3
+1317. Blue 3 -> Green 8
+1318. Green 8 -> Red 28
+1319. Red 28 -> Blue 42
+1320. Blue 42 -> Yellow 35
+1321. Yellow 35 -> Red 6
+1322. Red 6 -> Red 48
+1323. Red 48 -> Blue 39
+1324. Blue 39 -> Green 20
+1325. Green 20 -> Red 29
+1326. Red 29 -> Green 34
+1327. Green 34 -> Yellow 49
+1328. Yellow 49 -> Green 37
+1329. Green 37 -> Red 11
+1330. Red 11 -> Green 50
+1331. Green 50 -> Blue 2
+1332. Blue 2 -> Green 33
+1333. Green 33 -> Red 33
+1334. Red 33 -> Red 3
+1335. Red 3 -> Yellow 34
+1336. Yellow 34 -> Green 19
+1337. Green 19 -> Red 36
+1338. Red 36 -> Green 31
+1339. Green 31 -> Blue 5
+1340. Blue 5 -> Blue 48
+1341. Blue 48 -> Red 36
+1342. Red 36 -> Blue 27
+1343. Blue 27 -> Red 39
+1344. Red 39 -> Green 27
+1345. Green 27 -> Blue 2
+1346. Blue 2 -> Green 25
+1347. Green 25 -> Blue 31
+1348. Blue 31 -> Yellow 34
+1349. Yellow 34 -> Red 18
+1350. Red 18 -> Green 2
+1351. Green 2 -> Green 49
+1352. Green 49 -> Green 3
+1353. Green 3 -> Red 5
+1354. Red 5 -> Blue 5
+1355. Blue 5 -> Green 24
+1356. Green 24 -> Red 21
+1357. Red 21 -> Blue 33
+1358. Blue 33 -> Red 50
+1359. Red 50 -> Blue 22
+1360. Blue 22 -> Yellow 25
+1361. Yellow 25 -> Red 21
+1362. Red 21 -> Green 14
+1363. Green 14 -> Red 31
+1364. Red 31 -> Yellow 19
+1365. Yellow 19 -> Green 11
+1366. Green 11 -> Blue 19
+1367. Blue 19 -> Green 23
+1368. Green 23 -> Blue 31
+1369. Blue 31 -> Red 8
+1370. Red 8 -> Blue 36
+1371. Blue 36 -> Red 49
+1372. Red 49 -> Yellow 4
+1373. Yellow 4 -> Blue 11
+1374. Blue 11 -> Yellow 8
+1375. Yellow 8 -> Red 3
+1376. Red 3 -> Red 34
+1377. Red 34 -> Blue 38
+1378. Blue 38 -> Yellow 47
+1379. Yellow 47 -> Green 38
+1380. Green 38 -> Blue 30
+1381. Blue 30 -> Red 16
+1382. Red 16 -> Blue 39
+1383. Blue 39 -> Yellow 15
+1384. Yellow 15 -> Blue 5
+1385. Blue 5 -> Green 2
+1386. Green 2 -> Blue 22
+1387. Blue 22 -> Yellow 22
+1388. Yellow 22 -> Blue 28
+1389. Blue 28 -> Red 41
+1390. Red 41 -> Blue 46
+1391. Blue 46 -> Blue 3
+1392. Blue 3 -> Green 5
+1393. Green 5 -> Yellow 44
+1394. Yellow 44 -> Green 36
+1395. Green 36 -> Red 37
+1396. Red 37 -> Green 18
+1397. Green 18 -> Yellow 19
+1398. Yellow 19 -> Green 1
+1399. Green 1 -> Green 50
+1400. Green 50 -> Red 34
+1401. Red 34 -> Blue 48
+1402. Blue 48 -> Yellow 10
+1403. Yellow 10 -> Blue 5
+1404. Blue 5 -> Red 43
+1405. Red 43 -> Yellow 26
+1406. Yellow 26 -> Blue 27
+1407. Blue 27 -> Green 16
+1408. Green 16 -> Yellow 12
+1409. Yellow 12 -> Blue 4
+1410. Blue 4 -> Blue 49
+1411. Blue 49 -> Red 39
+1412. Red 39 -> Red 13
+1413. Red 13 -> Red 49
+1414. Red 49 -> Red 19
+1415. Red 19 -> Blue 34
+1416. Blue 34 -> Red 39
+1417. Red 39 -> Blue 29
+1418. Blue 29 -> Red 14
+1419. Red 14 -> Blue 35
+1420. Blue 35 -> Yellow 43
+1421. Yellow 43 -> Green 32
+1422. Green 32 -> Blue 29
+1423. Blue 29 -> Yellow 24
+1424. Yellow 24 -> Green 9
+1425. Green 9 -> Green 43
+1426. Green 43 -> Red 19
+1427. Red 19 -> Green 9
+1428. Green 9 -> Yellow 16
+1429. Yellow 16 -> Blue 10
+1430. Blue 10 -> Green 17
+1431. Green 17 -> Yellow 21
+1432. Yellow 21 -> Blue 46
+1433. Blue 46 -> Red 29
+1434. Red 29 -> Yellow 25
+1435. Yellow 25 -> Red 19
+1436. Red 19 -> Yellow 19
+1437. Yellow 19 -> Blue 15
+1438. Blue 15 -> Red 43
+1439. Red 43 -> Red 10
+1440. Red 10 -> Blue 36
+1441. Blue 36 -> Yellow 48
+1442. Yellow 48 -> Green 41
+1443. Green 41 -> Blue 15
+1444. Blue 15 -> Red 26
+1445. Red 26 -> Green 8
+1446. Green 8 -> Yellow 50
+1447. Yellow 50 -> Green 28
+1448. Green 28 -> Red 42
+1449. Red 42 -> Blue 37
+1450. Blue 37 -> Red 7
+1451. Red 7 -> Red 33
+1452. Red 33 -> Green 40
+1453. Green 40 -> Yellow 46
+1454. Yellow 46 -> Blue 39
+1455. Blue 39 -> Red 14
+1456. Red 14 -> Red 48
+1457. Red 48 -> Green 41
+1458. Green 41 -> Green 3
+1459. Green 3 -> Blue 13
+1460. Blue 13 -> Yellow 6
+1461. Yellow 6 -> Red 24
+1462. Red 24 -> Yellow 4
+1463. Yellow 4 -> Green 2
+1464. Green 2 -> Blue 20
+1465. Blue 20 -> Yellow 17
+1466. Yellow 17 -> Green 13
+1467. Green 13 -> Yellow 48
+1468. Yellow 48 -> Red 27
+1469. Red 27 -> Blue 43
+1470. Blue 43 -> Yellow 18
+1471. Yellow 18 -> Green 2
+1472. Green 2 -> Blue 46
+1473. Blue 46 -> Green 26
+1474. Green 26 -> Yellow 11
+1475. Yellow 11 -> Green 19
+1476. Green 19 -> Yellow 18
+1477. Yellow 18 -> Blue 8
+1478. Blue 8 -> Yellow 13
+1479. Yellow 13 -> Green 14
+1480. Green 14 -> Blue 10
+1481. Blue 10 -> Green 6
+1482. Green 6 -> Green 46
+1483. Green 46 -> Blue 50
+1484. Blue 50 -> Red 27
+1485. Red 27 -> Green 10
+1486. Green 10 -> Red 32
+1487. Red 32 -> Red 4
+1488. Red 4 -> Blue 32
+1489. Blue 32 -> Red 11
+1490. Red 11 -> Blue 30
+1491. Blue 30 -> Yellow 36
+1492. Yellow 36 -> Blue 41
+1493. Blue 41 -> Red 39
+1494. Red 39 -> Yellow 32
+1495. Yellow 32 -> Blue 39
+1496. Blue 39 -> Blue 1
+1497. Blue 1 -> Yellow 1
+1498. Yellow 1 -> Blue 49
+1499. Blue 49 -> Blue 7
+1500. Blue 7 -> Red 16
+1501. Red 16 -> Red 36
+1502. Red 36 -> Green 21
+1503. Green 21 -> Red 13
+1504. Red 13 -> Blue 29
+1505. Blue 29 -> Yellow 30
+1506. Yellow 30 -> Red 45
+1507. Red 45 -> Blue 30
+1508. Blue 30 -> Green 28
+1509. Green 28 -> Red 37
+1510. Red 37 -> Blue 44
+1511. Blue 44 -> Yellow 13
+1512. Yellow 13 -> Green 36
+1513. Green 36 -> Red 4
+1514. Red 4 -> Yellow 3
+1515. Yellow 3 -> Blue 35
+1516. Blue 35 -> Yellow 41
+1517. Yellow 41 -> Red 47
+1518. Red 47 -> Green 50
+1519. Green 50 -> Red 27
+1520. Red 27 -> Blue 47
+1521. Blue 47 -> Yellow 18
+1522. Yellow 18 -> Green 39
+1523. Green 39 -> Green 3
+1524. Green 3 -> Yellow 17
+1525. Yellow 17 -> Blue 49
+1526. Blue 49 -> Red 43
+1527. Red 43 -> Red 9
+1528. Red 9 -> Green 48
+1529. Green 48 -> Red 19
+1530. Red 19 -> Red 47
+1531. Red 47 -> Blue 22
+1532. Blue 22 -> Yellow 13
+1533. Yellow 13 -> Green 16
+1534. Green 16 -> Red 37
+1535. Red 37 -> Red 14
+1536. Red 14 -> Red 38
+1537. Red 38 -> Blue 50
+1538. Blue 50 -> Yellow 13
+1539. Yellow 13 -> Blue 3
+1540. Blue 3 -> Blue 37
+1541. Blue 37 -> Yellow 28
+1542. Yellow 28 -> Blue 19
+1543. Blue 19 -> Red 49
+1544. Red 49 -> Green 37
+1545. Green 37 -> Red 29
+1546. Red 29 -> Yellow 7
+1547. Yellow 7 -> Blue 12
+1548. Blue 12 -> Red 27
+1549. Red 27 -> Green 21
+1550. Green 21 -> Red 23
+1551. Red 23 -> Green 33
+1552. Green 33 -> Yellow 50
+1553. Yellow 50 -> Blue 49
+1554. Blue 49 -> Blue 28
+1555. Blue 28 -> Yellow 37
+1556. Yellow 37 -> Red 13
+1557. Red 13 -> Blue 42
+1558. Blue 42 -> Blue 7
+1559. Blue 7 -> Yellow 19
+1560. Yellow 19 -> Red 47
+1561. Red 47 -> Red 8
+1562. Red 8 -> Yellow 8
+1563. Yellow 8 -> Green 28
+1564. Green 28 -> Yellow 10
+1565. Yellow 10 -> Blue 11
+1566. Blue 11 -> Yellow 15
+1567. Yellow 15 -> Blue 25
+1568. Blue 25 -> Green 2
+1569. Green 2 -> Green 43
+1570. Green 43 -> Yellow 28
+1571. Yellow 28 -> Green 20
+1572. Green 20 -> Red 39
+1573. Red 39 -> Yellow 43
+1574. Yellow 43 -> Green 34
+1575. Green 34 -> Yellow 40
+1576. Yellow 40 -> Blue 40
+1577. Blue 40 -> Red 13
+1578. Red 13 -> Blue 3
+1579. Blue 3 -> Red 45
+1580. Red 45 -> Blue 36
+1581. Blue 36 -> Red 5
+1582. Red 5 -> Red 31
+1583. Red 31 -> Green 12
+1584. Green 12 -> Yellow 49
+1585. Yellow 49 -> Blue 35
+1586. Blue 35 -> Red 32
+1587. Red 32 -> Green 7
+1588. Green 7 -> Blue 3
+1589. Blue 3 -> Yellow 19
+1590. Yellow 19 -> Green 37
+1591. Green 37 -> Blue 14
+1592. Blue 14 -> Red 49
+1593. Red 49 -> Blue 48
+1594. Blue 48 -> Yellow 20
+1595. Yellow 20 -> Blue 2
+1596. Blue 2 -> Blue 34
+1597. Blue 34 -> Red 6
+1598. Red 6 -> Blue 32
+1599. Blue 32 -> Green 22
+1600. Green 22 -> Red 17
+1601. Red 17 -> Red 35
+1602. Red 35 -> Blue 28
+1603. Blue 28 -> Red 43
+1604. Red 43 -> Green 26
+1605. Green 26 -> Yellow 13
+1606. Yellow 13 -> Red 16
+1607. Red 16 -> Green 44
+1608. Green 44 -> Blue 2
+1609. Blue 2 -> Green 2
+1610. Green 2 -> Yellow 23
+1611. Yellow 23 -> Yellow 1
+1612. Yellow 1 -> Red 50
+1613. Red 50 -> Green 35
+1614. Green 35 -> Red 41
+1615. Red 41 -> Green 29
+1616. Green 29 -> Yellow 7
+1617. Yellow 7 -> Green 16
+1618. Green 16 -> Blue 24
+1619. Blue 24 -> Red 48
+1620. Red 48 -> Blue 20
+1621. Blue 20 -> Yellow 26
+1622. Yellow 26 -> Blue 10
+1623. Blue 10 -> Green 41
+1624. Green 41 -> Green 11
+1625. Green 11 -> Red 11
+1626. Red 11 -> Red 39
+1627. Red 39 -> Blue 37
+1628. Blue 37 -> Red 17
+1629. Red 17 -> Blue 30
+1630. Blue 30 -> Red 8
+1631. Red 8 -> Blue 39
+1632. Blue 39 -> Red 21
+1633. Red 21 -> Green 2
+1634. Green 2 -> Red 27
+1635. Red 27 -> Blue 6
+1636. Blue 6 -> Red 22
+1637. Red 22 -> Yellow 47
+1638. Yellow 47 -> Yellow 5
+1639. Yellow 5 -> Green 17
+1640. Green 17 -> Red 26
+1641. Red 26 -> Red 3
+1642. Red 3 -> Blue 34
+1643. Blue 34 -> Yellow 20
+1644. Yellow 20 -> Green 28
+1645. Green 28 -> Yellow 43
+1646. Yellow 43 -> Red 50
+1647. Red 50 -> Blue 7
+1648. Blue 7 -> Blue 46
+1649. Blue 46 -> Yellow 7
+1650. Yellow 7 -> Green 32
+1651. Green 32 -> Red 34
+1652. Red 34 -> Green 39
+1653. Green 39 -> Yellow 17
+1654. Yellow 17 -> Blue 9
+1655. Blue 9 -> Green 19
+1656. Green 19 -> Yellow 3
+1657. Yellow 3 -> Yellow 49
+1658. Yellow 49 -> Green 19
+1659. Green 19 -> Yellow 16
+1660. Yellow 16 -> Green 40
+1661. Green 40 -> Green 12
+1662. Green 12 -> Yellow 21
+1663. Yellow 21 -> Blue 5
+1664. Blue 5 -> Blue 33
+1665. Blue 33 -> Red 15
+1666. Red 15 -> Red 37
+1667. Red 37 -> Green 10
+1668. Green 10 -> Yellow 13
+1669. Yellow 13 -> Red 29
+1670. Red 29 -> Green 7
+1671. Green 7 -> Yellow 37
+1672. Yellow 37 -> Red 5
+1673. Red 5 -> Yellow 28
+1674. Yellow 28 -> Red 41
+1675. Red 41 -> Green 19
+1676. Green 19 -> Red 16
+1677. Red 16 -> Blue 47
+1678. Blue 47 -> Blue 29
+1679. Blue 29 -> Yellow 35
+1680. Yellow 35 -> Green 14
+1681. Green 14 -> Yellow 25
+1682. Yellow 25 -> Blue 30
+1683. Blue 30 -> Red 39
+1684. Red 39 -> Blue 47
+1685. Blue 47 -> Blue 1
+1686. Blue 1 -> Yellow 22
+1687. Yellow 22 -> Red 12
+1688. Red 12 -> Yellow 1
+1689. Yellow 1 -> Red 33
+1690. Red 33 -> Red 1
+1691. Red 1 -> Green 39
+1692. Green 39 -> Yellow 21
+1693. Yellow 21 -> Yellow 3
+1694. Yellow 3 -> Green 21
+1695. Green 21 -> Blue 8
+1696. Blue 8 -> Blue 44
+1697. Blue 44 -> Red 32
+1698. Red 32 -> Red 9
+1699. Red 9 -> Blue 33
+1700. Blue 33 -> Blue 3
+1701. Blue 3 -> Yellow 17
+1702. Yellow 17 -> Green 28
+1703. Green 28 -> Green 3
+1704. Green 3 -> Green 35
+1705. Green 35 -> Yellow 14
+1706. Yellow 14 -> Blue 7
+1707. Blue 7 -> Green 28
+1708. Green 28 -> Red 25
+1709. Red 25 -> Red 49
+1710. Red 49 -> Blue 10
+1711. Blue 10 -> Red 5
+1712. Red 5 -> Blue 40
+1713. Blue 40 -> Yellow 14
+1714. Yellow 14 -> Green 3
+1715. Green 3 -> Yellow 26
+1716. Yellow 26 -> Red 28
+1717. Red 28 -> Green 1
+1718. Green 1 -> Blue 6
+1719. Blue 6 -> Red 13
+1720. Red 13 -> Red 39
+1721. Red 39 -> Green 16
+1722. Green 16 -> Red 28
+1723. Red 28 -> Blue 49
+1724. Blue 49 -> Blue 33
+1725. Blue 33 -> Red 28
+1726. Red 28 -> Red 47
+1727. Red 47 -> Yellow 16
+1728. Yellow 16 -> Blue 4
+1729. Blue 4 -> Red 1
+1730. Red 1 -> Red 25
+1731. Red 25 -> Green 38
+1732. Green 38 -> Yellow 13
+1733. Yellow 13 -> Yellow 43
+1734. Yellow 43 -> Blue 28
+1735. Blue 28 -> Yellow 2
+1736. Yellow 2 -> Green 23
+1737. Green 23 -> Yellow 13
+1738. Yellow 13 -> Green 41
+1739. Green 41 -> Green 7
+1740. Green 7 -> Blue 25
+1741. Blue 25 -> Red 36
+1742. Red 36 -> Red 15
+1743. Red 15 -> Blue 1
+1744. Blue 1 -> Green 6
+1745. Green 6 -> Red 33
+1746. Red 33 -> Yellow 16
+1747. Yellow 16 -> Blue 21
+1748. Blue 21 -> Yellow 23
+1749. Yellow 23 -> Yellow 49
+1750. Yellow 49 -> Red 31
+1751. Red 31 -> Red 10
+1752. Red 10 -> Red 49
+1753. Red 49 -> Red 5
+1754. Red 5 -> Blue 28
+1755. Blue 28 -> Red 14
+1756. Red 14 -> Yellow 14
+1757. Yellow 14 -> Yellow 38
+1758. Yellow 38 -> Blue 27
+1759. Blue 27 -> Yellow 30
+1760. Yellow 30 -> Blue 16
+1761. Blue 16 -> Green 24
+1762. Green 24 -> Red 37
+1763. Red 37 -> Blue 18
+1764. Blue 18 -> Yellow 29
+1765. Yellow 29 -> Yellow 7
+1766. Yellow 7 -> Green 3
+1767. Green 3 -> Green 42
+1768. Green 42 -> Yellow 46
+1769. Yellow 46 -> Green 32
+1770. Green 32 -> Green 3
+1771. Green 3 -> Green 47
+1772. Green 47 -> Blue 49
+1773. Blue 49 -> Blue 31
+1774. Blue 31 -> Red 45
+1775. Red 45 -> Red 9
+1776. Red 9 -> Blue 35
+1777. Blue 35 -> Blue 47
+1778. Blue 47 -> Red 49
+1779. Red 49 -> Blue 15
+1780. Blue 15 -> Yellow 31
+1781. Yellow 31 -> Yellow 6
+1782. Yellow 6 -> Green 30
+1783. Green 30 -> Blue 3
+1784. Blue 3 -> Blue 39
+1785. Blue 39 -> Red 6
+1786. Red 6 -> Red 25
+1787. Red 25 -> Green 20
+1788. Green 20 -> Blue 5
+1789. Blue 5 -> Red 28
+1790. Red 28 -> Blue 39
+1791. Blue 39 -> Blue 10
+1792. Blue 10 -> Red 44
+1793. Red 44 -> Green 19
+1794. Green 19 -> Yellow 20
+1795. Yellow 20 -> Blue 24
+1796. Blue 24 -> Yellow 40
+1797. Yellow 40 -> Yellow 5
+1798. Yellow 5 -> Yellow 24
+1799. Yellow 24 -> Green 50
+1800. Green 50 -> Blue 27
+1801. Blue 27 -> Blue 49
+1802. Blue 49 -> Yellow 6
+1803. Yellow 6 -> Yellow 20
+1804. Yellow 20 -> Blue 6
+1805. Blue 6 -> Blue 32
+1806. Blue 32 -> Blue 46
+1807. Blue 46 -> Green 28
+1808. Green 28 -> Yellow 13
+1809. Yellow 13 -> Red 49
+1810. Red 49 -> Red 31
+1811. Red 31 -> Red 14
+1812. Red 14 -> Blue 49
+1813. Blue 49 -> Red 33
+1814. Red 33 -> Red 19
+1815. Red 19 -> Blue 31
+1816. Blue 31 -> Red 41
+1817. Red 41 -> Red 10
+1818. Red 10 -> Blue 13
+1819. Blue 13 -> Blue 39
+1820. Blue 39 -> Yellow 8
+1821. Yellow 8 -> Green 2
+1822. Green 2 -> Yellow 35
+1823. Yellow 35 -> Red 39
+1824. Red 39 -> Green 14
+1825. Green 14 -> Green 39
+1826. Green 39 -> Blue 5
+1827. Blue 5 -> Green 3
+1828. Green 3 -> Yellow 3
+1829. Yellow 3 -> Green 11
+1830. Green 11 -> Green 46
+1831. Green 46 -> Green 4
+1832. Green 4 -> Green 27
+1833. Green 27 -> Yellow 10
+1834. Yellow 10 -> Green 39
+1835. Green 39 -> Green 13
+1836. Green 13 -> Red 29
+1837. Red 29 -> Blue 2
+1838. Blue 2 -> Yellow 21
+1839. Yellow 21 -> Blue 35
+1840. Blue 35 -> Blue 1
+1841. Blue 1 -> Green 11
+1842. Green 11 -> Red 1
+1843. Red 1 -> Red 26
+1844. Red 26 -> Yellow 16
+1845. Yellow 16 -> Yellow 36
+1846. Yellow 36 -> Red 5
+1847. Red 5 -> Blue 41
+1848. Blue 41 -> Blue 8
+1849. Blue 8 -> Red 20
+1850. Red 20 -> Red 45
+1851. Red 45 -> Yellow 26
+1852. Yellow 26 -> Yellow 49
+1853. Yellow 49 -> Green 39
+1854. Green 39 -> Blue 39
+1855. Blue 39 -> Green 2
+1856. Green 2 -> Red 6
+1857. Red 6 -> Red 45
+1858. Red 45 -> Red 29
+1859. Red 29 -> Red 49
+1860. Red 49 -> Yellow 16
+1861. Yellow 16 -> Yellow 5
+1862. Yellow 5 -> Green 31
+1863. Green 31 -> Yellow 10
+1864. Yellow 10 -> Blue 17
+1865. Blue 17 -> Green 34
+1866. Green 34 -> Blue 50
+1867. Blue 50 -> Blue 25
+1868. Blue 25 -> Green 1
+1869. Green 1 -> Yellow 39
+1870. Yellow 39 -> Yellow 7
+1871. Yellow 7 -> Yellow 23
+1872. Yellow 23 -> Blue 1
+1873. Blue 1 -> Blue 41
+1874. Blue 41 -> Red 15
+1875. Red 15 -> Green 45
+1876. Green 45 -> Green 21
+1877. Green 21 -> Green 3
+1878. Green 3 -> Green 31
+1879. Green 31 -> Red 5
+1880. Red 5 -> Red 21
+1881. Red 21 -> Red 31
+1882. Red 31 -> Blue 23
+1883. Blue 23 -> Yellow 43
+1884. Yellow 43 -> Blue 47
+1885. Blue 47 -> Blue 39
+1886. Blue 39 -> Red 36
+1887. Red 36 -> Green 28
+1888. Green 28 -> Yellow 33
+1889. Yellow 33 -> Green 15
+1890. Green 15 -> Green 38
+1891. Green 38 -> Yellow 18
+1892. Yellow 18 -> Blue 16
+1893. Blue 16 -> Yellow 37
+1894. Yellow 37 -> Blue 39
+1895. Blue 39 -> Red 23
+1896. Red 23 -> Red 2
+1897. Red 2 -> Green 1
+1898. Green 1 -> Blue 10
+1899. Blue 10 -> Yellow 32
+1900. Yellow 32 -> Yellow 2
+1901. Yellow 2 -> Yellow 16
+1902. Yellow 16 -> Blue 26
+1903. Blue 26 -> Green 21
+1904. Green 21 -> Red 38
+1905. Red 38 -> Blue 38
+1906. Blue 38 -> Blue 14
+1907. Blue 14 -> Yellow 32
+1908. Yellow 32 -> Blue 5
+1909. Blue 5 -> Yellow 47
+1910. Yellow 47 -> Yellow 24
+1911. Yellow 24 -> Green 41
+1912. Green 41 -> Yellow 16
+1913. Yellow 16 -> Red 2
+1914. Red 2 -> Blue 35
+1915. Blue 35 -> Blue 49
+1916. Blue 49 -> Yellow 27
+1917. Yellow 27 -> Yellow 13
+1918. Yellow 13 -> Yellow 5
+1919. Yellow 5 -> Red 48
+1920. Red 48 -> Red 33
+1921. Red 33 -> Red 5
+1922. Red 5 -> Red 26
+1923. Red 26 -> Green 3
+1924. Green 3 -> Blue 1
+1925. Blue 1 -> Green 21
+1926. Green 21 -> Yellow 16
+1927. Yellow 16 -> Green 25
+1928. Green 25 -> Yellow 1
+1929. Yellow 1 -> Blue 41
+1930. Blue 41 -> Blue 49
+1931. Blue 49 -> Green 12
+1932. Green 12 -> Red 41
+1933. Red 41 -> Red 31
+1934. Red 31 -> Red 17
+1935. Red 17 -> Green 3
+1936. Green 3 -> Green 19
+1937. Green 19 -> Green 41
+1938. Green 41 -> Yellow 5
+1939. Yellow 5 -> Green 33
+1940. Green 33 -> Green 2
+1941. Green 2 -> Yellow 36
+1942. Yellow 36 -> Red 47
+1943. Red 47 -> Blue 35
+1944. Blue 35 -> Blue 11
+1945. Blue 11 -> Red 48
+1946. Red 48 -> Blue 31
+1947. Blue 31 -> Blue 7
+1948. Blue 7 -> Yellow 5
+1949. Yellow 5 -> Yellow 43
+1950. Yellow 43 -> Yellow 16
+1951. Yellow 16 -> Green 15
+1952. Green 15 -> Yellow 24
+1953. Yellow 24 -> Yellow 13
+1954. Yellow 13 -> Blue 10
+1955. Blue 10 -> Blue 2
+1956. Blue 2 -> Red 38
+1957. Red 38 -> Blue 31
+1958. Blue 31 -> Red 22
+1959. Red 22 -> Red 5
+1960. Red 5 -> Blue 33
+1961. Blue 33 -> Yellow 28
+1962. Yellow 28 -> Yellow 10
+1963. Yellow 10 -> Red 5
+1964. Red 5 -> Red 17
+1965. Red 17 -> Green 9
+1966. Green 9 -> Red 41
+1967. Red 41 -> Yellow 42
+1968. Yellow 42 -> Blue 33
+1969. Blue 33 -> Red 29
+1970. Red 29 -> Green 41
+1971. Green 41 -> Green 21
+1972. Green 21 -> Yellow 10
+1973. Yellow 10 -> Green 41
+1974. Green 41 -> Green 5
+1975. Green 5 -> Green 31
+1976. Green 31 -> Blue 22
+1977. Blue 22 -> Green 10
+1978. Green 10 -> Green 42
+1979. Green 42 -> Red 25
+1980. Red 25 -> Red 35
+1981. Red 35 -> Red 17
+1982. Red 17 -> Blue 49
+1983. Blue 49 -> Red 5
+1984. Red 5 -> Blue 42
+1985. Blue 42 -> Red 11
+1986. Red 11 -> Red 27
+1987. Red 27 -> Green 7
+1988. Green 7 -> Blue 27
+1989. Blue 27 -> Blue 39
+1990. Blue 39 -> Red 18
+1991. Red 18 -> Red 27
+1992. Red 27 -> Red 49
+1993. Red 49 -> Red 39
+1994. Red 39 -> Red 31
+1995. Red 31 -> Red 39
+1996. Red 39 -> Red 47
+1997. Red 47 -> Green 19
+1998. Green 19 -> Blue 43
+1999. Blue 43 -> Red 35
+2000. Red 35 -> Red 28

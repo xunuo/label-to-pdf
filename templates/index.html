@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>String Art Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 10px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 8px;
+        }
+        
+        .header p {
+            font-size: 1em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 20px;
+            padding: 20px;
+        }
+        
+        .upload-section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+        }
+        
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 10px;
+            padding: 25px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+        }
+        
+        .upload-area:hover {
+            border-color: #764ba2;
+            background: rgba(102, 126, 234, 0.05);
+        }
+        
+        .upload-area.dragover {
+            border-color: #764ba2;
+            background: rgba(102, 126, 234, 0.1);
+        }
+        
+        .upload-icon {
+            font-size: 2.5em;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            width: 100%;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .results-section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+        }
+        
+        .image-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .image-container {
+            text-align: center;
+        }
+        
+        .image-container h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .image-container img {
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        
+        .circle-legend {
+            display: none;
+            margin-top: 10px;
+            position: relative;
+        }
+        
+        .circle-legend.show {
+            display: block;
+        }
+        
+        .legend-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .canvas-with-quadrants {
+            position: relative;
+            display: inline-block;
+            margin: 20px;
+            border-radius: 50%;
+            padding: 8px;
+            background: conic-gradient(
+                from 0deg,
+                #007bff 0deg 90deg,    /* Blue - 3 to 6 o'clock (0° to 90°) */
+                #dc3545 90deg 180deg,  /* Red - 6 to 9 o'clock (90° to 180°) */
+                #28a745 180deg 270deg, /* Green - 9 to 12 o'clock (180° to 270°) */
+                #ffc107 270deg 360deg  /* Yellow - 12 to 3 o'clock (270° to 360°) */
+            );
+        }
+        
+        .canvas-with-quadrants img {
+            display: block;
+            border-radius: 50%;
+            border: 4px solid white;
+            width: 100%;
+            height: auto;
+        }
+        
+        .quadrant-label {
+            position: absolute;
+            padding: 6px 10px;
+            border-radius: 15px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
+            font-size: 11px;
+            white-space: nowrap;
+            z-index: 10;
+        }
+        
+        .quadrant-label.blue { 
+            background-color: rgba(0, 123, 255, 0.9); 
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .quadrant-label.red { 
+            background-color: rgba(220, 53, 69, 0.9); 
+            top: 50%;
+            right: -10px;
+            transform: translateY(-50%);
+        }
+        
+        .quadrant-label.green { 
+            background-color: rgba(40, 167, 69, 0.9); 
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .quadrant-label.yellow { 
+            background-color: rgba(255, 193, 7, 0.9); 
+            color: black; 
+            text-shadow: 1px 1px 2px rgba(255,255,255,0.7);
+            top: 50%;
+            left: -10px;
+            transform: translateY(-50%);
+        }
+        
+        .quadrant-colors {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            text-align: center;
+        }
+        
+        .quadrant {
+            padding: 8px;
+            border-radius: 5px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+        
+        .quadrant.blue { background-color: #007bff; }
+        .quadrant.red { background-color: #dc3545; }
+        .quadrant.green { background-color: #28a745; }
+        .quadrant.yellow { background-color: #ffc107; color: black; text-shadow: none; }
+        
+        .colored-instructions {
+            font-family: monospace;
+            font-size: 12px;
+            line-height: 1.4;
+            max-height: 200px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .progress-container {
+            width: 100%;
+            background-color: #f0f0f0;
+            border-radius: 10px;
+            margin: 15px 0;
+            overflow: hidden;
+            height: 25px;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            min-width: 0;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .info-panel {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .info-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        
+        .download-btn {
+            background: #28a745;
+            margin-top: 15px;
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 5px;
+            }
+            
+            .content {
+                grid-template-columns: 1fr;
+                gap: 15px;
+                padding: 15px;
+            }
+            
+            .image-comparison {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧵 String Art Generator</h1>
+            <p>Transform your images into beautiful string art patterns</p>
+        </div>
+        
+        <div class="content">
+            <div class="upload-section">
+                <h2>Upload & Configure</h2>
+                
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">📁</div>
+                    <p><strong>Click to upload</strong> or drag and drop your image here</p>
+                    <p>Supports: PNG, JPG, JPEG, GIF, BMP</p>
+                </div>
+                
+                <input type="file" id="imageInput" accept="image/*" style="display: none;">
+                
+                <form id="stringArtForm">
+                    <div class="form-group">
+                        <label for="totalNails">Number of Nails:</label>
+                        <input type="number" id="totalNails" name="total_nails" value="200" min="50">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="sideLen">Output Size (pixels):</label>
+                        <input type="number" id="sideLen" name="side_len" value="800" min="300" max="2000">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="exportStrength">String Strength:</label>
+                        <input type="number" id="exportStrength" name="export_strength" value="0.1" min="0.01" max="1" step="0.01">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="pullAmount">Max Iterations:</label>
+                        <input type="number" id="pullAmount" name="pull_amount" value="2000" min="100" max="10000">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="randomNails">Random Nails (optional):</label>
+                        <input type="number" id="randomNails" name="random_nails" value="100" placeholder="Leave empty for all nails" min="10">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="shapeType">Shape:</label>
+                        <select id="shapeType" name="shape_type">
+                            <option value="circle">Circle</option>
+                            <option value="rectangle">Rectangle</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="whiteBackground" name="white_background">
+                            <label for="whiteBackground">White Background</label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="rgbMode" name="rgb_mode">
+                            <label for="rgbMode">RGB Mode (Color)</label>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn" id="generateBtn" disabled>
+                        Generate String Art
+                    </button>
+                </form>
+            </div>
+            
+            <div class="results-section">
+                <h2>Results</h2>
+                
+                <div id="resultsContent">
+                    <p style="text-align: center; color: #666; padding: 40px;">
+                        Upload an image and click "Generate String Art" to see results here.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const uploadArea = document.getElementById('uploadArea');
+        const imageInput = document.getElementById('imageInput');
+        const form = document.getElementById('stringArtForm');
+        const generateBtn = document.getElementById('generateBtn');
+        const resultsContent = document.getElementById('resultsContent');
+        const shapeType = document.getElementById('shapeType');
+        const totalNailsInput = document.getElementById('totalNails');
+        
+        let selectedFile = null;
+        let originalImageUrl = null;
+        let progressInterval;
+        let currentTaskId = null;
+        
+        // Upload area events
+        uploadArea.addEventListener('click', () => imageInput.click());
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFileSelect(files[0]);
+            }
+        });
+        
+        imageInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFileSelect(e.target.files[0]);
+            }
+        });
+        
+        // Shape change event listener
+        shapeType.addEventListener('change', (e) => {
+            updateLegendVisibility();
+        });
+        
+        // Nail count change event listener
+        totalNailsInput.addEventListener('input', (e) => {
+            updateLegendLabels();
+        });
+        
+        function updateLegendVisibility() {
+            const legends = document.querySelectorAll('.circle-legend');
+            const isCircle = shapeType.value === 'circle';
+            
+            legends.forEach(legend => {
+                if (isCircle) {
+                    legend.classList.add('show');
+                } else {
+                    legend.classList.remove('show');
+                }
+            });
+        }
+        
+        function updateLegendLabels() {
+            const totalNails = parseInt(totalNailsInput.value) || 200;
+            const nailsPerQuadrant = Math.floor(totalNails / 4);
+            
+            const labels = document.querySelectorAll('.quadrant-label');
+            labels.forEach(label => {
+                if (label.classList.contains('blue')) {
+                    label.textContent = `Blue (1-${nailsPerQuadrant})`;
+                } else if (label.classList.contains('red')) {
+                    label.textContent = `Red (1-${nailsPerQuadrant})`;
+                } else if (label.classList.contains('green')) {
+                    label.textContent = `Green (1-${nailsPerQuadrant})`;
+                } else if (label.classList.contains('yellow')) {
+                    label.textContent = `Yellow (1-${nailsPerQuadrant})`;
+                }
+            });
+        }
+        
+        function handleFileSelect(file) {
+            if (!file.type.startsWith('image/')) {
+                alert('Please select an image file.');
+                return;
+            }
+            
+            selectedFile = file;
+            generateBtn.disabled = false;
+            
+            // Create preview URL
+            originalImageUrl = URL.createObjectURL(file);
+            
+            // Update upload area
+            uploadArea.innerHTML = `
+                <div class="upload-icon">✅</div>
+                <p><strong>File selected:</strong> ${file.name}</p>
+                <p>Click to change file</p>
+            `;
+            
+            // Show original image immediately
+            const totalNails = parseInt(document.getElementById('totalNails').value) || 200;
+            const nailsPerQuadrant = Math.floor(totalNails / 4);
+            
+            resultsContent.innerHTML = `
+                <div class="image-comparison">
+                    <div class="image-container">
+                        <h3>Original Image</h3>
+                        <img src="${originalImageUrl}" alt="Original">
+                    </div>
+                    <div class="image-container">
+                        <h3>String Art Result</h3>
+                        <p style="color: #666; padding: 40px;">Click "Generate String Art" to see the result here.</p>
+                        
+                        <!-- Circle Legend -->
+                        <div class="circle-legend ${shapeType.value === 'circle' ? 'show' : ''}" id="circleLegend">
+                            <div class="legend-title">Circle Quadrants</div>
+                            <div class="canvas-with-quadrants">
+                                <img src="${originalImageUrl}" alt="Original">
+                                <div class="quadrant-label blue">Blue (1-${nailsPerQuadrant})</div>
+                                <div class="quadrant-label red">Red (1-${nailsPerQuadrant})</div>
+                                <div class="quadrant-label green">Green (1-${nailsPerQuadrant})</div>
+                                <div class="quadrant-label yellow">Yellow (1-${nailsPerQuadrant})</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!selectedFile) {
+                alert('Please select an image first.');
+                return;
+            }
+            
+            generateBtn.disabled = true;
+            generateBtn.textContent = 'Processing...';
+            
+            // Show loading with original image preserved
+            resultsContent.innerHTML = `
+                <div class="image-comparison">
+                    <div class="image-container">
+                        <h3>Original Image</h3>
+                        <img src="${originalImageUrl}" alt="Original">
+                    </div>
+                    <div class="image-container">
+                        <h3>String Art Result</h3>
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            <p>Generating string art...</p>
+                            <div class="progress-container">
+                                <div class="progress-bar" id="progressBar" style="width: 0%">0%</div>
+                            </div>
+                            <p style="font-size: 12px; color: #666;">This may take a few minutes depending on parameters</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            try {
+                const formData = new FormData();
+                formData.append('image', selectedFile);
+                
+                // Add all form parameters
+                const formElements = form.elements;
+                for (let element of formElements) {
+                    if (element.type === 'checkbox') {
+                        formData.append(element.name, element.checked);
+                    } else if (element.value && element.name) {
+                        formData.append(element.name, element.value);
+                    }
+                }
+                
+                const response = await fetch('/api/process', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success && result.task_id) {
+                    // Start tracking progress with the task ID
+                    startProgressTracking(result.task_id);
+                } else {
+                    showError(result.error || 'Unknown error occurred');
+                }
+            } catch (error) {
+                showError('Network error: ' + error.message);
+            } finally {
+                generateBtn.disabled = false;
+                generateBtn.textContent = 'Generate String Art';
+            }
+        });
+        
+        function showResults(result) {
+            const isCircle = shapeType.value === 'circle';
+            const nailsPerQuadrant = Math.floor(result.nails_count / 4);
+            
+            const legendHtml = isCircle ? `
+                <div class="circle-legend show">
+                    <div class="legend-title">Circle Quadrants</div>
+                    <div class="canvas-with-quadrants">
+                        <img src="/api/view/${result.output_file}" alt="String Art Result">
+                        <div class="quadrant-label blue">Blue (1-${nailsPerQuadrant})</div>
+                        <div class="quadrant-label red">Red (1-${nailsPerQuadrant})</div>
+                        <div class="quadrant-label green">Green (1-${nailsPerQuadrant})</div>
+                        <div class="quadrant-label yellow">Yellow (1-${nailsPerQuadrant})</div>
+                    </div>
+                </div>
+            ` : '';
+            
+            const instructionsHtml = isCircle ? `
+                <div class="info-item">
+                    <span><strong>Colored Instructions:</strong></span>
+                </div>
+                <div class="colored-instructions">${result.pull_order}</div>
+            ` : `
+                <div class="info-item">
+                    <span><strong>Pull Order (first 100):</strong></span>
+                    <span style="font-family: monospace; font-size: 0.9em;">${result.pull_order}</span>
+                </div>
+            `;
+            
+            resultsContent.innerHTML = `
+                <div class="image-comparison">
+                    <div class="image-container">
+                        <h3>Original Image</h3>
+                        <img src="${originalImageUrl}" alt="Original">
+                    </div>
+                    <div class="image-container">
+                        <h3>String Art Result</h3>
+                        ${isCircle ? legendHtml : `<img src="/api/view/${result.output_file}" alt="String Art Result">`}
+                    </div>
+                </div>
+                
+                <div class="info-panel">
+                    <div class="info-item">
+                        <span><strong>Nails Used:</strong></span>
+                        <span>${result.nails_count}</span>
+                    </div>
+                    ${instructionsHtml}
+                    
+                    <a href="/api/download/${result.output_file}" class="btn download-btn" download>
+                        📥 Download Result
+                    </a>
+                    <a href="/api/download/${result.instructions_file}" class="btn download-btn" download style="margin-left: 10px;">
+                        📄 Download Instructions
+                    </a>
+                </div>
+            `;
+        }
+        
+        function showError(error) {
+            resultsContent.innerHTML = `
+                <div class="image-comparison">
+                    <div class="image-container">
+                        <h3>Original Image</h3>
+                        <img src="${originalImageUrl}" alt="Original">
+                    </div>
+                    <div class="image-container">
+                        <h3>String Art Result</h3>
+                        <div class="error">
+                            <strong>Error:</strong> ${error}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function startProgressTracking(taskId) {
+            currentTaskId = taskId;
+            const progressBar = document.getElementById('progressBar');
+            
+            progressInterval = setInterval(async () => {
+                try {
+                    const response = await fetch(`/api/progress/${taskId}`);
+                    const data = await response.json();
+                    
+                    if (data.progress !== undefined) {
+                        progressBar.style.width = data.progress + '%';
+                        progressBar.textContent = Math.round(data.progress) + '%';
+                        
+                        // Update message
+                        const messageElement = document.querySelector('.loading p');
+                        if (messageElement && data.message) {
+                            messageElement.textContent = data.message;
+                        }
+                        
+                        if (data.status === 'completed' && data.result) {
+                            clearInterval(progressInterval);
+                            if (data.result.success) {
+                                showResults(data.result);
+                            } else {
+                                showError(data.result.error);
+                            }
+                        } else if (data.status === 'error') {
+                            clearInterval(progressInterval);
+                            showError(data.message);
+                        }
+                    }
+                } catch (error) {
+                    console.error('Progress tracking error:', error);
+                }
+            }, 500); // Check every 500ms
+        }
+    </script>
+</body>
+</html> 
