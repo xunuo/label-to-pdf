@@ -217,8 +217,8 @@ def annotate_image_to_pdf(img: Image.Image, annots: list, buf: BytesIO, label_co
 
 
         # 获取对应颜色，fallback 为绿色
-        bg_col = label_color_map.get(label, "#00ff00")
-        st_col = label_color_map.get(label, "#00ff00")
+        bg_col = label_color_map.get(label, "green")
+        st_col = label_color_map.get(label, "green")
 
         box_fill_color   = parse_html_color(bg_col, alpha=0.15)
         box_stroke_color = parse_html_color(st_col, alpha=0.5)
