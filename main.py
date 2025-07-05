@@ -143,6 +143,7 @@ def annotate_image_to_pdf(img: Image.Image, annots: list, buf: BytesIO):
     c.drawImage(reader, 0, 0, width=w, height=h)
 
     # 样式预计算
+    font_size = 10
     font_color       = parse_html_color("white", alpha=0.8)
     padding          = font_size * 0.2
     bg_h             = font_size + 2 * padding
