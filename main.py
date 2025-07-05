@@ -141,8 +141,9 @@ def annotate_image_to_pdf(img: Image.Image, annots: list, buf: BytesIO,
     bg_h             = font_size + 2 * padding
     box_fill_color   = parse_html_color("green", alpha=0.2)
     box_stroke_color = parse_html_color("green", alpha=0.3)
-    text_bg_color    = parse_html_color("green", alpha=0.5)
-
+    text_bg_color    = parse_html_color("green", alpha=0.4)
+    text_bg_stroke_color   = parse_html_color("darkgreen", alpha=0.5)
+                            
     for ann in annots:
         val    = ann['value']
         rot    = val.get('rotation', 0)
@@ -170,6 +171,7 @@ def annotate_image_to_pdf(img: Image.Image, annots: list, buf: BytesIO,
         # 文字背景框（同宽、紧贴上方）
         bg_w = max(tw + 2*padding, rect_w)
         c.setFillColor(text_bg_color)
+        c.setStrokeColor(text_bg_stroke_color)
         c.rect(-bg_w/2, -rect_h, bg_w, bg_h, fill=1, stroke=1)
 
         # 渲染文字（水平 & 垂直居中于文字背景）
