@@ -317,7 +317,7 @@ def download():
         timestamp = updated_at
 
     # 构造 PDF title metadata（含时间）
-    pdf_title = f"{project_title} / Task Id: {task_id} / Last Modified (Sydney Time): {timestamp}"
+    pdf_title = f"{project_title} / Task ID: {task_id} / Last Modified (Sydney Time): {timestamp}"
     # 构造下载文件名（不含时间）
     download_filename = f"{project_title}[task.{task_id}].pdf"
 
