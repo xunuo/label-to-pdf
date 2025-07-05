@@ -135,29 +135,47 @@ def convert_text_to_meters_text(text: str) -> str:
 
 def load_annotations(task_json: dict) -> list:
     """
-    提取所有标注，包含 rectangle/polygon + textarea，
-    并把 label 名称也带上：
+    从 task_json['annotations'][0]['result'] 中提取出每个 region 的：
+      - value（坐标）
+      - text（textarea）
+      - label（labels）
+    聚合后返回列表。
     """
     annots = []
     results = task_json.get('annotations', [{}])[0].get('result', [])
+
+    # 临时按 id 聚合
+    rects  = {}  # id -> value dict（坐标、大小、旋转）
+    texts  = {}  # id -> text str
+    labels = {}  # id -> label str
+
     for e in results:
-        t = e['type']
-        if t in ('rectangle', 'polygon'):
-            labels = e['value'].get(f"{t}labels", [])
-            annots.append({
-                'type':  t,
-                'value': e['value'],
-                'text':  '',
-                'label': labels[0] if labels else None,
-            })
+        eid = e['id']
+        t   = e['type']
+
+        if t == 'rectangle' or t == 'polygon':
+            rects[eid] = e['value']
+
+        elif t == 'labels':
+            # e['value']['labels'] 是个列表，通常只有一个元素
+            labs = e['value'].get('labels', [])
+            if labs:
+                labels[eid] = labs[0]
+
         elif t == 'textarea':
-            annots.append({
-                'type':  t,
-                'value': None,
-                'text':  ''.join(e['value'].get('text', [])),
-                'label': None,
-            })
+            texts[eid] = ''.join(e['value'].get('text', []))
+
+    # 合并
+    for eid, val in rects.items():
+        annots.append({
+            'type':  'rectangle',     # 或 'polygon'，如需区分可用 val 里原始 type
+            'value': val,
+            'text':  texts.get(eid, ''),
+            'label': labels.get(eid),  # 这里就不会再是 None
+        })
+
     return annots
+
 
 
 def annotate_image_to_pdf(img: Image.Image, annots: list, buf: BytesIO, label_color_map: dict):
