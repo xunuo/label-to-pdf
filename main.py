@@ -210,7 +210,7 @@ def annotate_image_to_pdf(img: Image.Image, annots: list, buf: BytesIO, label_co
         # 选择并格式化文本
         if label == 'Length':
             # ⟼
-            icon = '⟼ ↦ ⇥'
+            icon = '↦ '
             text = convert_length_text(raw_text)
         elif label == 'Bearing':
             icon = '∠ '
