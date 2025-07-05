@@ -18,7 +18,7 @@ def download():
         'https://itag.app/data/upload/1/e5660918-15723dp-images-1.jpg'
     )
     # 2. 从环境变量读取 Label Studio API Key
-    ls_token = '8415e0a065d9382be7643284f113acaca84ff989'
+    ls_token = os.getenv('label_studio_api_token')
     if not ls_token:
         return jsonify({"error": "Label Studio API token not configured"}), 500
 
