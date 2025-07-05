@@ -93,7 +93,7 @@ def convert_length_text(text: str) -> str:
       - 纯数字 "50"（视作 50 英尺）
       - 简写三段 "159 0 12"（12 表示 1/2）
       - 只有英寸或分数，如 5 1/2", 1/2"
-    输出示例： 5' 0" ↦ 1.524m
+    输出示例： 5' 0" ↦ 1.524 m
     解析失败则返回原文本。
     """
     # 分数到 Unicode 的映射
@@ -150,7 +150,7 @@ def convert_length_text(text: str) -> str:
     frac_txt = frac_map.get((num, den), f"{num}/{den}") if den else ''
     inch_txt = f'{inches}{frac_txt}"'
 
-    return f"{feet}' {inch_txt} ↦ {meters_str}m"
+    return f"{feet}' {inch_txt} ↦ {meters_str} m"
 
       
 
