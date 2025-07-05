@@ -176,14 +176,14 @@ def annotate_image_to_pdf(img: Image.Image, annots: list, buf: BytesIO):
 
 
     # —— 配置字体／配色 —— #
-    font_color        = parse_html_color("white", alpha=0.8)
+    font_color        = parse_html_color("white", alpha=0.7)
     font_size         = 10
     pad               = font_size * 0.2
     bg_h              = font_size + 2 * pad     # 文字背景高度 = 字体 + 上下各 pad
 
-    box_fill_color    = parse_html_color("green", alpha=0.2)
-    text_bg_color     = parse_html_color("green", alpha=0.6)
-    box_stroke_color  = parse_html_color("green", alpha=0.2)
+    box_fill_color    = parse_html_color("green", alpha=0.1)
+    text_bg_color     = parse_html_color("green", alpha=0.5)
+    box_stroke_color  = parse_html_color("green", alpha=0.3)
 
     # —— 主循环 —— #
     for ann in annots:
