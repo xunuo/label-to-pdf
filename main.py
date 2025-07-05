@@ -152,7 +152,7 @@ def convert_bearing_text(text: str) -> str:
         dms_str = f"{parts[0]}° {parts[1] if len(parts)>1 else '0'}′ {parts[2] if len(parts)>2 else '0'}″"
         getcontext().prec = 10
         deg = d + m / Decimal(60) + s / Decimal(3600)
-        return f"{dms_str} ∡ {deg:.3f}°"
+        return f"{dms_str} ∡∢ {deg:.3f}°"
     except Exception:
         return text
 
