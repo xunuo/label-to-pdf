@@ -165,17 +165,17 @@ def annotate_image_to_pdf(img: Image.Image, annots: list, buf: BytesIO,
         # 注释框背景
         c.setFillColor(box_fill_color)
         c.setStrokeColor(box_stroke_color)
-        c.rect(-rect_w/2, -rect_h/2, rect_w, rect_h, fill=1, stroke=1)
+        c.rect(-rect_w/2, -rect_h, rect_w, rect_h, fill=1, stroke=1)
 
         # 文字背景框（同宽、紧贴上方）
         bg_w = max(tw + 2*padding, rect_w)
         c.setFillColor(text_bg_color)
-        c.rect(-bg_w/2, rect_h/2, bg_w, bg_h, fill=1, stroke=0)
+        c.rect(-bg_w/2, rect_h, bg_w, bg_h, fill=1, stroke=0)
 
         # 渲染文字（水平 & 垂直居中于文字背景）
         c.setFillColor(font_color)
         c.setFont("DejaVuSans", font_size)
-        text_y = rect_h/2 + padding - font_size/2
+        text_y = rect_h + padding - font_size/2
         c.drawCentredString(0, text_y, text)
 
         c.restoreState()
