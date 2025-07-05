@@ -17,12 +17,10 @@ from flask import Flask, send_file, jsonify, request
 from PIL import Image
 from reportlab.pdfgen import canvas
 from reportlab.lib.utils import ImageReader
-from reportlab.lib.colors import Color, green, white
+from reportlab.lib.colors import Color
 from reportlab.pdfbase.pdfmetrics import stringWidth
-
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
-
 
 BASE_DIR = os.path.dirname(__file__)
 FONT_PATH = os.path.join(BASE_DIR, 'DejaVuSans.ttf')
@@ -39,6 +37,43 @@ if not LABEL_STUDIO_TOKEN:
     raise RuntimeError("请先在环境变量中配置 label_studio_api_token")
 # —————— #
 
+def parse_html_color(col, alpha=None):
+    from reportlab.lib import colors
+    # 如果已经是 Color
+    if isinstance(col, Color):
+        base = col
+        return Color(base.red, base.green, base.blue, alpha or base.alpha)
+    # 元组或列表
+    if isinstance(col, (tuple, list)):
+        vals = list(col)
+        if max(vals) > 1:
+            vals = [v/255 for v in vals]
+        r, g, b = vals[:3]
+        a = vals[3] if len(vals) == 4 else (alpha or 1.0)
+        return Color(r, g, b, alpha=a)
+    s = col.strip().lower()
+    # Hex
+    if s.startswith('#') or all(c in '0123456789abcdef' for c in s):
+        hs = s.lstrip('#')
+        if len(hs) == 6:
+            r = int(hs[0:2],16)/255
+            g = int(hs[2:4],16)/255
+            b = int(hs[4:6],16)/255
+            a = alpha or 1.0
+        elif len(hs) == 8:
+            r = int(hs[0:2],16)/255
+            g = int(hs[2:4],16)/255
+            b = int(hs[4:6],16)/255
+            a = (int(hs[6:8],16)/255) if alpha is None else alpha
+        else:
+            raise ValueError(f"Invalid hex color: {col}")
+        return Color(r, g, b, alpha=a)
+    # CSS 名称
+    try:
+        base = getattr(colors, s)
+        return parse_html_color(base, alpha=alpha)
+    except Exception:
+        raise ValueError(f"Unknown color name: {col}")
 
 def convert_text_to_meters_text(text: str) -> str:
     frac_map = {
@@ -58,27 +93,26 @@ def convert_text_to_meters_text(text: str) -> str:
         feet = int(parts[0])
         inches = int(parts[1]) if len(parts) >= 2 else 0
         frac = int(parts[2]) if len(parts) == 3 else 0
-
-        numerator = int(str(frac)[:-1]) if frac else 0
-        denominator = int(str(frac)[-1]) if frac else 1
-
-        total_m = Decimal(feet) * FOOT_TO_M + Decimal(inches) * INCH_TO_M
         if frac:
-            total_m += (Decimal(numerator) / Decimal(denominator)) * INCH_TO_M
-
+            s = str(frac)
+            num, den = int(s[:-1]), int(s[-1])
+        else:
+            num = den = 0
+        total_m = Decimal(feet)*FOOT_TO_M + Decimal(inches)*INCH_TO_M
+        if frac:
+            total_m += (Decimal(num)/Decimal(den))*INCH_TO_M
         meters_str = f"{total_m:.3f}"
-        result = f"{feet}'"
+        res = f"{feet}'"
         if inches or frac:
-            result += f" {inches}"
+            res += f" {inches}"
         if frac:
-            result += frac_map.get((numerator, denominator), f"{numerator}/{denominator}")
+            res += frac_map.get((num, den), f"{num}/{den}")
         if inches or frac:
-            result += '"'
-        result += f" = {meters_str} m"
-        return result
+            res += '"'
+        res += f" = {meters_str} m"
+        return res
     except Exception:
         return text
-
 
 def load_annotations(task_json: dict) -> list:
     annots = []
@@ -94,52 +128,66 @@ def load_annotations(task_json: dict) -> list:
         annots.append({'value': rect, 'text': texts.get(eid, '')})
     return annots
 
-
 def annotate_image_to_pdf(img: Image.Image, annots: list, buf: BytesIO,
                           bg_alpha: float = 0.6, font_size: float = 10):
     w, h = img.size
     c = canvas.Canvas(buf, pagesize=(w, h))
 
-    # 用 ImageReader 读取内存中的图片
+    # 绘制底图
     img_bio = BytesIO()
     img.save(img_bio, format='PNG')
     img_bio.seek(0)
     reader = ImageReader(img_bio)
     c.drawImage(reader, 0, 0, width=w, height=h)
 
+    # —— 样式预计算 —— #
+    font_color       = parse_html_color("white", alpha=0.8)
+    padding          = font_size * 0.2
+    bg_h             = font_size + 2 * padding
+    box_fill_color   = parse_html_color("green", alpha=bg_alpha)
+    box_stroke_color = parse_html_color("green", alpha=bg_alpha)
+    text_bg_color    = parse_html_color("green", alpha=0.6)
+
     for ann in annots:
-        val = ann['value']
-        rot = val.get('rotation', 0)
-        xc = (val['x'] / 100) * w
-        yc = h - (val['y'] / 100) * h
-        rect_w = (val['width'] / 100) * w
+        val    = ann['value']
+        rot    = val.get('rotation', 0)
+        # 框中心
+        xc     = (val['x']      / 100) * w
+        yc     = h - (val['y']   / 100) * h
+        rect_w = (val['width']  / 100) * w
+
         text = convert_text_to_meters_text(ann['text'])
+        tw   = stringWidth(text, "DejaVuSans", font_size)
 
         c.saveState()
+        # 平移到框中心 → 旋转 → 再向右移半框宽
         c.translate(xc, yc)
         c.rotate(-rot)
         c.translate(rect_w / 2, 0)
 
-        tw = stringWidth(text, "DejaVuSans", font_size)
-        pad = font_size * 0.2
-        bg_w = max(tw + 2 * pad, rect_w)
-        bg_h = font_size + 2 * pad
+        # 注释框背景（中心对齐）
+        c.setFillColor(box_fill_color)
+        c.setStrokeColor(box_stroke_color)
+        c.rect(-rect_w/2, -rect_w/2, rect_w, rect_w, fill=1, stroke=1)
 
-        c.setFillColor(Color(green.red, green.green, green.blue, alpha=bg_alpha))
-        c.rect(-bg_w/2, -bg_h/2, bg_w, bg_h, fill=1, stroke=0)
-        c.setFillColor(white)
+        # 文字背景框（同宽、紧贴上方）
+        bg_w = max(tw + 2*padding, rect_w)
+        c.setFillColor(text_bg_color)
+        c.rect(-bg_w/2, rect_w/2, bg_w, bg_h, fill=1, stroke=0)
+
+        # 文字（居中）
+        c.setFillColor(font_color)
         c.setFont("DejaVuSans", font_size)
-        c.drawCentredString(0, -font_size/2 + pad/2, text)
+        c.drawCentredString(0, rect_w/2 + padding - font_size/2, text)
+
         c.restoreState()
 
     c.showPage()
     c.save()
 
-
 @app.route('/')
 def index():
     return jsonify({"Choo Choo": "Welcome to your Flask app 🚅"})
-
 
 @app.route('/download')
 def download():
@@ -149,53 +197,29 @@ def download():
         return jsonify({"error": "请通过 ?project=<id>&task=<id> 指定参数"}), 400
 
     headers = {'Authorization': f"Token {LABEL_STUDIO_TOKEN}"}
-
-    # 获取 Project title
     pj = requests.get(f"{LABEL_STUDIO_HOST}/api/projects/{project_id}", headers=headers)
-    try:
-        pj.raise_for_status()
-        title = pj.json().get('title', f'project_{project_id}')
-    except requests.HTTPError as e:
-        return jsonify({"error": "获取 Project 失败", "details": str(e)}), pj.status_code
+    pj.raise_for_status()
+    title = pj.json().get('title', f'project_{project_id}')
 
-    # 获取 Task JSON
     tj = requests.get(f"{LABEL_STUDIO_HOST}/api/tasks/{task_id}", headers=headers)
-    try:
-        tj.raise_for_status()
-    except requests.HTTPError as e:
-        return jsonify({"error": "获取 Task 失败", "details": str(e)}), tj.status_code
+    tj.raise_for_status()
     task_json = tj.json()
 
-    # 下载 OCR 图像
     ocr_path = task_json.get('data', {}).get('ocr')
     if not ocr_path:
         return jsonify({"error": "Task JSON 中未找到 data['ocr']"}), 500
     ir = requests.get(f"{LABEL_STUDIO_HOST}{ocr_path}", headers=headers)
-    try:
-        ir.raise_for_status()
-    except requests.HTTPError as e:
-        return jsonify({"error": "下载图像失败", "details": str(e)}), ir.status_code
+    ir.raise_for_status()
     img = Image.open(BytesIO(ir.content)).convert('RGB')
 
-    # 渲染注释到 PDF
-    annots = load_annotations(task_json)
+    annots  = load_annotations(task_json)
     pdf_buf = BytesIO()
     annotate_image_to_pdf(img, annots, pdf_buf)
     pdf_buf.seek(0)
 
-    # 触发下载
     filename = f"{title}.pdf"
-    return send_file(
-        pdf_buf,
-        as_attachment=True,
-        download_name=filename,
-        mimetype='application/pdf'
-    )
-
+    return send_file(pdf_buf, as_attachment=True,
+                     download_name=filename, mimetype='application/pdf')
 
 if __name__ == '__main__':
-    app.run(
-        host='0.0.0.0',
-        port=int(os.getenv("PORT", 5000)),
-        debug=True
-    )
+    app.run(host='0.0.0.0', port=int(os.getenv("PORT", 5000)), debug=True)
