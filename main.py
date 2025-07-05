@@ -22,10 +22,11 @@ from reportlab.pdfbase.pdfmetrics import stringWidth
 
 from reportlab.pdfbase.ttfonts import TTFont
 
-# 在程序初始化时调用一次
-pdfmetrics.registerFont(
-    TTFont("DejaVuSans", "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf")
-)
+BASE_DIR = os.path.dirname(__file__)
+FONT_PATH = os.path.join(BASE_DIR, 'DejaVuSans.ttf')
+
+# 注册字体
+pdfmetrics.registerFont(TTFont("DejaVuSans", FONT_PATH))
 
 app = Flask(__name__)
 
