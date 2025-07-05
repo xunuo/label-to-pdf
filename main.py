@@ -84,74 +84,89 @@ def parse_html_color(color_val, alpha=None):
     except Exception:
         raise ValueError(f"Unknown color name: {color_val}")
 
-
 def convert_length_text(text: str) -> str:
     """
-    将英尺-英寸格式（支持分数）转换为米，并格式化输出。
-    示例：
-      155' 5½"   -> 47.123 m
-      "5½\""     -> "0' 5½\" ↦ 0.167 m"
-      "7'"       -> "7' 0\" ↦ 2.134 m"
-      "5"        -> "5' 0\" ↦ 1.524 m"
-      "10 1"     -> "10' 1\" ↦ 3.048 m"
-      "0 5"      -> "0' 5\" ↦ 0.127 m"
-      "159 0 12" -> "159' 0½\" ↦ ... m"
-      "150' 5 1/4\"" -> "150' 5¼\" ↦ ... m"
+    将英尺英寸格式的文本转换为米，并格式化输出。
+    支持：
+      - "155 5 14" （feet inches frac）
+      - "155' 5 1/4\""
+      - "155'5\""
+      - "5 1/2\""      （只写英寸和分数，补全为 0' 5½"）
+      - "155"          （纯数字，视作英尺）
+      - "1/2\""        （只写分数英寸，补全为 0' 0½"）
+    输出示例： 5' 0" = 1.524 m
     """
-    import re
-    from decimal import Decimal, getcontext
-
     frac_map = {
-        (1, 2): '½', (1, 3): '⅓', (2, 3): '⅔', (1, 4): '¼', (3, 4): '¾',
-        (1, 5): '⅕', (2, 5): '⅖', (3, 5): '⅗', (4, 5): '⅘', (1, 6): '⅙',
-        (5, 6): '⅚', (1, 8): '⅛', (3, 8): '⅜', (5, 8): '⅝', (7, 8): '⅞'
+        (1,2): '½', (1,3): '⅓', (2,3): '⅔',
+        (1,4): '¼', (3,4): '¾',
+        (1,5): '⅕', (2,5): '⅖', (3,5): '⅗', (4,5): '⅘',
+        (1,6): '⅙', (5,6): '⅚',
+        (1,8): '⅛', (3,8): '⅜', (5,8): '⅝', (7,8): '⅞',
     }
     getcontext().prec = 10
-    FOOT_TO_M = Decimal('0.3048')
+    FOOT_TO_M  = Decimal('0.3048')
     INCH_TO_M = Decimal('0.0254')
 
     s = text.strip()
     try:
-        feet = inches = num = den = 0
-        # 空格分隔无符号数字：英尺 英寸 [分子/分母]
-        m_space_frac = re.fullmatch(r"(\d+)\s+(\d+)\s+(\d+)\s*/\s*(\d+)", s)
-        m_space = re.fullmatch(r"(\d+)\s+(\d+)", s)
-        if m_space_frac:
-            feet, inches, num, den = map(int, m_space_frac.groups())
-        elif m_space:
-            feet, inches = map(int, m_space.groups())
+        # 正则解析：英尺、英寸、分数都可选
+        m = re.match(
+            r"""^\s*
+                (?:(\d+)\s*')?               # 可选 feet
+                \s*(\d+)?                   # 可选 inches
+                (?:\s*(\d+)\s*/\s*(\d+))?    # 可选 fraction
+                \s*"?\s*$""",
+            s, re.VERBOSE
+        )
+        if m:
+            feet   = int(m.group(1)) if m.group(1) else 0
+            inches = int(m.group(2)) if m.group(2) else 0
+            num    = int(m.group(3)) if m.group(3) else 0
+            den    = int(m.group(4)) if m.group(4) else 0
         else:
-            # 通用格式: [英尺'] [英寸] [/分数]
-            pattern = r"^(?:\s*(?P<feet>\d+)\s*'\s*)?(?P<inches>\d+)?(?:\s+(?P<num>\d+)\s*/\s*(?P<den>\d+))?\"?$"
-            m = re.fullmatch(pattern, s)
-            if m:
-                feet = int(m.group('feet') or 0)
-                inches = int(m.group('inches') or 0)
-                num = int(m.group('num') or 0)
-                den = int(m.group('den') or 0)
+            # 回退空格分割逻辑，补全 feet=0
+            parts = s.split()
+            if not 1 <= len(parts) <= 3:
+                raise ValueError
+            if '/' in parts[0] and len(parts) == 1:
+                feet = inches = 0
+                num_s, den_s = parts[0].split('/', 1)
+                num, den = int(num_s), int(den_s)
             else:
-                # 纯数字当英尺
-                if re.fullmatch(r"\d+", s):
-                    feet = int(s)
+                if len(parts) == 1:
+                    feet, inches, num, den = int(parts[0]), 0, 0, 0
+                elif len(parts) == 2:
+                    if '/' not in parts[1]:
+                        feet, inches, num, den = int(parts[0]), int(parts[1]), 0, 0
+                    else:
+                        feet, inches = 0, 0
+                        num_s, den_s = parts[1].split('/', 1)
+                        num, den = int(num_s), int(den_s)
                 else:
-                    raise ValueError(f"无法解析长度: {text}")
+                    feet, inches = int(parts[0]), int(parts[1])
+                    if '/' in parts[2]:
+                        num_s, den_s = parts[2].split('/', 1)
+                        num, den = int(num_s), int(den_s)
+                    else:
+                        num, den = int(parts[2][:-1]), int(parts[2][-1])
 
-        # 计算总米数
+        # 计算米
         total_m = Decimal(feet) * FOOT_TO_M + Decimal(inches) * INCH_TO_M
         if num and den:
             total_m += (Decimal(num) / Decimal(den)) * INCH_TO_M
-        meter_str = f"{total_m:.3f}"
 
-        # 格式化原始输入
-        orig = f"{feet}' {inches}"
+        # 格式化输出，总是显示 inches（默认为0）和分数
+        meters_str = f"{total_m:.3f}"
+        res = f"{feet}' {inches}"
         if num and den:
-            orig += frac_map.get((num, den), f"{num}/{den}")
-        orig += '"'
-        return f"{orig} ↦ {meter_str}m"
+            res += frac_map.get((num, den), f"{num}/{den}")
+        res += '"'
+        res += f" ↦ {meters_str}m"
+        return res
+
     except Exception:
         return text
-
-
+      
 
 def convert_bearing_text(text: str) -> str:
     """
