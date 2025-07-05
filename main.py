@@ -149,7 +149,7 @@ def annotate_image_to_pdf(img: Image.Image, annots: list, buf: BytesIO):
     box_fill_color   = parse_html_color("green", alpha=0.2)
     box_stroke_color = parse_html_color("green", alpha=0.3)
     text_bg_color    = parse_html_color("green", alpha=0.4)
-    text_bg_stroke_color   = parse_html_color("green", alpha=0.5)
+    text_bg_stroke_color   = parse_html_color("green", alpha=0.3)
                             
     for ann in annots:
         val    = ann['value']
