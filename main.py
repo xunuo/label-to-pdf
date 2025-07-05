@@ -89,12 +89,18 @@ def convert_length_text(text: str) -> str:
     """
     将英尺-英寸格式（支持分数）转换为米，并格式化输出。
     示例：
-      155' 5½" = 47.123 m
-      如果缺失英尺或英寸，则用0补齐，比如:
-      "5½\""  -> "0' 5½\" ↦ 0.167 m"
-      "7'"     -> "7' 0\" ↦ 2.134 m"
-      单数字(无符号)如"5" -> "5' 0\" ↦ 1.524 m"
+      155' 5½"   -> 47.123 m
+      "5½\""     -> "0' 5½\" ↦ 0.167 m"
+      "7'"       -> "7' 0\" ↦ 2.134 m"
+      "5"        -> "5' 0\" ↦ 1.524 m"
+      "10 1"     -> "10' 1\" ↦ 3.048 m"
+      "0 5"      -> "0' 5\" ↦ 0.127 m"
+      "159 0 12" -> "159' 0½\" ↦ ... m"
+      "150' 5 1/4\"" -> "150' 5¼\" ↦ ... m"
     """
+    import re
+    from decimal import Decimal, getcontext
+
     frac_map = {
         (1, 2): '½', (1, 3): '⅓', (2, 3): '⅔', (1, 4): '¼', (3, 4): '¾',
         (1, 5): '⅕', (2, 5): '⅖', (3, 5): '⅗', (4, 5): '⅘', (1, 6): '⅙',
@@ -106,20 +112,29 @@ def convert_length_text(text: str) -> str:
 
     s = text.strip()
     try:
-        # 仅数字无符号情况下当作英尺处理
-        if re.fullmatch(r"\d+", s):
-            feet = int(s)
-            inches = num = den = 0
+        feet = inches = num = den = 0
+        # 空格分隔无符号数字：英尺 英寸 [分子/分母]
+        m_space_frac = re.fullmatch(r"(\d+)\s+(\d+)\s+(\d+)\s*/\s*(\d+)", s)
+        m_space = re.fullmatch(r"(\d+)\s+(\d+)", s)
+        if m_space_frac:
+            feet, inches, num, den = map(int, m_space_frac.groups())
+        elif m_space:
+            feet, inches = map(int, m_space.groups())
         else:
-            # 支持可选英尺(')和可选英寸数字及可选分数，末尾可带双引号(")
-            pattern = r'^(?:\s*(?P<feet>\d+)\s*\'\s*)?(?P<inches>\d+)?(?:\s+(?P<num>\d+)\s*/\s*(?P<den>\d+))?"?\s*$'
-            m = re.match(pattern, s)
-            if not m:
-                raise ValueError(f"无法解析长度: {text}")
-            feet = int(m.group('feet') or 0)
-            inches = int(m.group('inches') or 0)
-            num = int(m.group('num') or 0)
-            den = int(m.group('den') or 0)
+            # 通用格式: [英尺'] [英寸] [/分数]
+            pattern = r"^(?:\s*(?P<feet>\d+)\s*'\s*)?(?P<inches>\d+)?(?:\s+(?P<num>\d+)\s*/\s*(?P<den>\d+))?\"?$"
+            m = re.fullmatch(pattern, s)
+            if m:
+                feet = int(m.group('feet') or 0)
+                inches = int(m.group('inches') or 0)
+                num = int(m.group('num') or 0)
+                den = int(m.group('den') or 0)
+            else:
+                # 纯数字当英尺
+                if re.fullmatch(r"\d+", s):
+                    feet = int(s)
+                else:
+                    raise ValueError(f"无法解析长度: {text}")
 
         # 计算总米数
         total_m = Decimal(feet) * FOOT_TO_M + Decimal(inches) * INCH_TO_M
@@ -127,15 +142,15 @@ def convert_length_text(text: str) -> str:
             total_m += (Decimal(num) / Decimal(den)) * INCH_TO_M
         meter_str = f"{total_m:.3f}"
 
-        # 格式化原始输入显示
+        # 格式化原始输入
         orig = f"{feet}' {inches}"
         if num and den:
             orig += frac_map.get((num, den), f"{num}/{den}")
         orig += '"'
-
-        return f"{orig} ↦ {meter_str} m"
+        return f"{orig} ↦ {meter_str}m"
     except Exception:
         return text
+
 
 
 def convert_bearing_text(text: str) -> str:
