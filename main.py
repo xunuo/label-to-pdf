@@ -16,13 +16,14 @@ from decimal import Decimal, getcontext
 from flask import Flask, send_file, jsonify, request
 from PIL import Image
 from reportlab.pdfgen import canvas
+from reportlab.lib.utils import ImageReader
 from reportlab.lib.colors import Color, green, white
 from reportlab.pdfbase.pdfmetrics import stringWidth
 
 app = Flask(__name__)
 
 # —— 配置 —— #
-LABEL_STUDIO_HOST  = os.getenv('label_studio_host')
+LABEL_STUDIO_HOST  = os.getenv('label_studio_host', 'https://itag.app')
 LABEL_STUDIO_TOKEN = os.getenv('label_studio_api_token')
 if not LABEL_STUDIO_TOKEN:
     raise RuntimeError("请先在环境变量中配置 label_studio_api_token")
@@ -89,10 +90,12 @@ def annotate_image_to_pdf(img: Image.Image, annots: list, buf: BytesIO,
     w, h = img.size
     c = canvas.Canvas(buf, pagesize=(w, h))
 
+    # 使用 ImageReader 从内存读取图片
     img_bio = BytesIO()
     img.save(img_bio, format='PNG')
     img_bio.seek(0)
-    c.drawImage(img_bio, 0, 0, width=w, height=h)
+    reader = ImageReader(img_bio)
+    c.drawImage(reader, 0, 0, width=w, height=h)
 
     for ann in annots:
         val = ann['value']
