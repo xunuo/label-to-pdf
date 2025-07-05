@@ -31,8 +31,8 @@ from dateutil import parser, tz
 app = Flask(__name__)
 
 # 环境变量配置
-LABEL_STUDIO_HOST = os.getenv('LABEL_STUDIO_HOST', 'https://itag.app')
-LABEL_STUDIO_TOKEN = os.getenv('LABEL_STUDIO_TOKEN')
+LABEL_STUDIO_HOST  = os.getenv('label_studio_host', 'https://itag.app')
+LABEL_STUDIO_TOKEN = os.getenv('label_studio_api_token')
 if not LABEL_STUDIO_TOKEN:
     raise RuntimeError("请先配置环境变量：LABEL_STUDIO_TOKEN")
 
