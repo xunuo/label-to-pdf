@@ -201,28 +201,25 @@ def annotate_image_to_pdf(img: Image.Image, annots: list, buf: BytesIO):
         text = convert_text_to_meters_text(ann['text'])
         tw = stringWidth(text, "DejaVuSans", font_size)
         pad = font_size * 0.2
-        bg_w = max(tw + 2 * pad, rect_w)
-        bg_h = font_size + 2 * pad
-    
+        bg_h = font_size + 2 * pad    # 背景高度 = 字体 + 上下各 pad
+        
         c.saveState()
         c.translate(x_px, y_px)
         c.rotate(-rot)
         
-        # 1) 整个框的半透明背景
+        # —— 注释框背景 —— #
         c.setFillColor(parse_html_color(box_bg_color, alpha=box_bg_alpha))
         c.rect(0, 0, rect_w, rect_h, fill=1, stroke=0)
         
-        # 2) 文字背景，同宽
-        bg_w = rect_w
-        # 放在框顶部
+        # —— 文字背景框，紧贴注释框顶部 —— #
         tx_bg = 0
-        ty_bg = rect_h + pad
+        ty_bg = rect_h
         c.setFillColor(parse_html_color(font_bg_color, alpha=font_bg_alpha))
-        c.rect(tx_bg, ty_bg, bg_w, bg_h, fill=1, stroke=0)
+        c.rect(tx_bg, ty_bg, rect_w, bg_h, fill=1, stroke=0)
         
-        # 3) 文字，水平居中
-        text_x = (rect_w - tw) / 2
-        text_y = ty_bg + pad/2
+        # —— 左对齐文字，左右上下各留 pad —— #
+        text_x = pad               # 左侧留一个 pad
+        text_y = ty_bg + pad       # 底部留一个 pad
         c.setFillColor(parse_html_color(font_color, alpha=font_alpha))
         c.setFont("DejaVuSans", font_size)
         c.drawString(text_x, text_y, text)
