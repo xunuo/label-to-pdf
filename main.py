@@ -134,7 +134,7 @@ def convert_length_text(text: str) -> str:
             orig += frac_map.get((num, den), f"{num}/{den}")
         if inches or (num and den):
             orig += '"'
-        return f"{orig} = {meter_str} m"
+        return f"{orig} ↦ {meter_str} m"
     except Exception:
         return text
 
@@ -152,7 +152,7 @@ def convert_bearing_text(text: str) -> str:
         dms_str = f"{parts[0]}° {parts[1] if len(parts)>1 else '0'}′ {parts[2] if len(parts)>2 else '0'}″"
         getcontext().prec = 10
         deg = d + m / Decimal(60) + s / Decimal(3600)
-        return f"{dms_str} = {deg:.3f}°"
+        return f"{dms_str} ⦠ {deg:.3f}°"
     except Exception:
         return text
 
@@ -223,12 +223,14 @@ def annotate_image_to_pdf(
         label = ann.get('label')
         raw = ann.get('text', '')
 
-        if label == 'Length':
-            disp = '↦ ' + convert_length_text(raw)
-        elif label == 'Bearing':
-            disp = '∠ ' + convert_bearing_text(raw)
-        else:
-            disp = raw
+        # if label == 'Length':
+        #     disp = '↦ ' + convert_length_text(raw)
+        # elif label == 'Bearing':
+        #     disp = '∠ ' + convert_bearing_text(raw)
+        # else:
+        #     disp = raw
+      
+        disp = raw
 
         base_col = color_map.get(label, '#00ff00')
         fill_col = parse_html_color(base_col, alpha=0.15)
