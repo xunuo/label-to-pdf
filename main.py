@@ -84,8 +84,6 @@ def parse_html_color(color_val, alpha=None):
     except Exception:
         raise ValueError(f"Unknown color name: {color_val}")
 
-import re
-from decimal import Decimal, getcontext
 
 def convert_length_text(text: str) -> str:
     """
