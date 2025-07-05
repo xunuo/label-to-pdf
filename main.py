@@ -22,7 +22,7 @@ from reportlab.pdfbase.pdfmetrics import stringWidth
 app = Flask(__name__)
 
 # —— 配置 —— #
-LABEL_STUDIO_HOST  = os.getenv('label_studio_host', 'https://itag.app')
+LABEL_STUDIO_HOST  = os.getenv('label_studio_host')
 LABEL_STUDIO_TOKEN = os.getenv('label_studio_api_token')
 if not LABEL_STUDIO_TOKEN:
     raise RuntimeError("请先在环境变量中配置 label_studio_api_token")
