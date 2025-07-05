@@ -91,8 +91,8 @@ def convert_length_text(text: str) -> str:
     支持：
       - 含引号的各种格式，如 "155' 5 1/4\"", "155'5\""
       - 纯数字 “50”（视作 50 英尺）
-      - 三部分简写 “159 0 12”（视作 159' 0½"）
-      - 只写英寸或分数，如 “5 1/2\""、"1/2\""
+      - 三部分简写 “159 0 12”（视作 159' 0½"")
+      - 只写英寸或分数，如 “5 1/2\"”、"1/2\""
     输出示例： 5' 0" = 1.524 m
     """
     frac_map = {
@@ -125,25 +125,17 @@ def convert_length_text(text: str) -> str:
         if denominator:
             total_m += (Decimal(numerator)/Decimal(denominator))*INCH_TO_M
         meters_str = f"{total_m:.3f}"
-        # 组装输出
-        result = f"{feet}'"
-        if inches or denominator:
-            result += f" {inches}"
-        if denominator:
-            result += frac_text
-        if inches or denominator:
-            result += '"'
-        result += f" = {meters_str} m"
+        # 始终显示英寸，即使为 0
+        result = f"{feet}' {inches}{frac_text}\" = {meters_str} m"
         return result
 
     # —— 2. 含引号或复杂格式 —— #
     try:
-        # 先用正则解析 feet/inches/fraction
         m = re.match(
             r"""^\s*
                 (?:(\d+)\s*')?               # feet
                 \s*(\d+)?                     # inches
-                (?:\s*(\d+)\s*/\s*(\d+))?     # fraction
+                (?:\s*(\d+)\s*/\s*(\d+))?  # fraction
                 \s*"?\s*$""",
             s, re.VERBOSE
         )
@@ -153,7 +145,6 @@ def convert_length_text(text: str) -> str:
             num    = int(m.group(3)) if m.group(3) else 0
             den    = int(m.group(4)) if m.group(4) else 0
         else:
-            # 回退：空格分割、含 "/" 或纯数字混合的复杂情况
             parts = s.split()
             if not 1 <= len(parts) <= 3:
                 raise ValueError
@@ -168,7 +159,7 @@ def convert_length_text(text: str) -> str:
                     if '/' not in parts[1]:
                         feet, inches, num, den = int(parts[0]), int(parts[1]), 0, 0
                     else:
-                        feet, inches = 0, 0
+                        feet = inches = 0
                         n_s, d_s = parts[1].split('/', 1)
                         num, den = int(n_s), int(d_s)
                 else:
@@ -177,7 +168,6 @@ def convert_length_text(text: str) -> str:
                         n_s, d_s = parts[2].split('/', 1)
                         num, den = int(n_s), int(d_s)
                     else:
-                        # fallback: e.g. "5 1 4" 视作 5'1 1/4"
                         num, den = int(parts[2][:-1]), int(parts[2][-1])
         # 计算米
         total_m = Decimal(feet)*FOOT_TO_M + Decimal(inches)*INCH_TO_M
@@ -186,15 +176,13 @@ def convert_length_text(text: str) -> str:
         meters_str = f"{total_m:.3f}"
 
         # 格式化输出
-        result = f"{feet}' {inches}"
-        if num and den:
-            result += frac_map.get((num, den), f"{num}/{den}")
-        result += '"'
-        result += f" ↦ {meters_str}m"
+        frac_text = frac_map.get((num, den), f"{num}/{den}") if num and den else ''
+        result = f"{feet}' {inches}{frac_text}\" ↦ {meters_str}m"
         return result
 
     except Exception:
         return text
+
       
 
 def convert_bearing_text(text: str) -> str:
