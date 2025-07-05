@@ -179,8 +179,8 @@ def annotate_image_to_pdf(img: Image.Image, annots: list, buf: BytesIO):
     font_size = 10
     font_alpha = 0.8
   
-    bg_color = "green"
-    bg_alpha = 0.6
+    font_bg_color = "green"
+    font_bg_alpha = 0.6
   
     for ann in annots:
         val = ann['value']
@@ -188,6 +188,7 @@ def annotate_image_to_pdf(img: Image.Image, annots: list, buf: BytesIO):
         xc = (val['x'] / 100) * w
         yc = h - (val['y'] / 100) * h
         rect_w = (val['width'] / 100) * w
+        rect_h = (val['height'] / 100) * h
         text = convert_text_to_meters_text(ann['text'])
 
         c.saveState()
@@ -200,9 +201,12 @@ def annotate_image_to_pdf(img: Image.Image, annots: list, buf: BytesIO):
         bg_w = max(tw + 2 * pad, rect_w)
         bg_h = font_size + 2 * pad
 
-        c.setFillColor(parse_html_color(bg_color, alpha=bg_alpha))
-        c.rect(-bg_w/2, -bg_h/2, bg_w, bg_h, fill=1, stroke=1)
+        c.setFillColor(parse_html_color(font_bg_color, alpha=font_bg_alpha))
+        c.rect(-bg_w/2, -bg_h/2, bg_w, bg_h, fill=1, stroke=0)
 
+        c.setFillColor(parse_html_color(font_bg_color, alpha=0.2))
+        c.rect(-xc, -yc, rect_w, rect_h, fill=1, stroke=1)
+      
         c.setFillColor(parse_html_color(font_color, alpha=font_alpha))
         c.setFont("DejaVuSans", font_size)
         c.drawCentredString(0, -font_size/2 + pad/2, text)
