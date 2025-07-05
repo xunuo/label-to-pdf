@@ -32,11 +32,11 @@ if not LABEL_STUDIO_TOKEN:
 
 def convert_text_to_meters_text(text: str) -> str:
     frac_map = {
-        (1,2): '½', (1,3): '⅓', (2,3): '⅔',
-        (1,4): '¼', (3,4): '¾',
-        (1,5): '⅕', (2,5): '⅖', (3,5): '⅗', (4,5): '⅘',
-        (1,6): '⅙', (5,6): '⅚',
-        (1,8): '⅛', (3,8): '⅜', (5,8): '⅝', (7,8): '⅞',
+        (1, 2): '½', (1, 3): '⅓', (2, 3): '⅔',
+        (1, 4): '¼', (3, 4): '¾',
+        (1, 5): '⅕', (2, 5): '⅖', (3, 5): '⅗', (4, 5): '⅘',
+        (1, 6): '⅙', (5, 6): '⅚',
+        (1, 8): '⅛', (3, 8): '⅜', (5, 8): '⅝', (7, 8): '⅞',
     }
     getcontext().prec = 10
     FOOT_TO_M = Decimal('0.3048')
@@ -90,7 +90,7 @@ def annotate_image_to_pdf(img: Image.Image, annots: list, buf: BytesIO,
     w, h = img.size
     c = canvas.Canvas(buf, pagesize=(w, h))
 
-    # 使用 ImageReader 从内存读取图片
+    # 用 ImageReader 读取内存中的图片
     img_bio = BytesIO()
     img.save(img_bio, format='PNG')
     img_bio.seek(0)
@@ -140,6 +140,7 @@ def download():
 
     headers = {'Authorization': f"Token {LABEL_STUDIO_TOKEN}"}
 
+    # 获取 Project title
     pj = requests.get(f"{LABEL_STUDIO_HOST}/api/projects/{project_id}", headers=headers)
     try:
         pj.raise_for_status()
@@ -147,6 +148,7 @@ def download():
     except requests.HTTPError as e:
         return jsonify({"error": "获取 Project 失败", "details": str(e)}), pj.status_code
 
+    # 获取 Task JSON
     tj = requests.get(f"{LABEL_STUDIO_HOST}/api/tasks/{task_id}", headers=headers)
     try:
         tj.raise_for_status()
@@ -154,6 +156,7 @@ def download():
         return jsonify({"error": "获取 Task 失败", "details": str(e)}), tj.status_code
     task_json = tj.json()
 
+    # 下载 OCR 图像
     ocr_path = task_json.get('data', {}).get('ocr')
     if not ocr_path:
         return jsonify({"error": "Task JSON 中未找到 data['ocr']"}), 500
@@ -164,11 +167,13 @@ def download():
         return jsonify({"error": "下载图像失败", "details": str(e)}), ir.status_code
     img = Image.open(BytesIO(ir.content)).convert('RGB')
 
+    # 渲染注释到 PDF
     annots = load_annotations(task_json)
     pdf_buf = BytesIO()
     annotate_image_to_pdf(img, annots, pdf_buf)
     pdf_buf.seek(0)
 
+    # 触发下载
     filename = f"{title}.pdf"
     return send_file(
         pdf_buf,
