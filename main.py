@@ -177,7 +177,7 @@ def annotate_image_to_pdf(img: Image.Image, annots: list, buf: BytesIO,
         # 渲染文字（水平 & 垂直居中于文字背景）
         c.setFillColor(font_color)
         c.setFont("DejaVuSans", font_size)
-        text_y = rect_h + padding - font_size
+        text_y = -rect_h + padding - font_size
         c.drawCentredString(0, text_y, text)
 
         c.restoreState()
