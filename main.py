@@ -17,8 +17,7 @@ from flask import Flask, send_file, jsonify, request
 from PIL import Image
 from reportlab.pdfgen import canvas
 from reportlab.lib.utils import ImageReader
-from reportlab.lib import colors
-from reportlab.lib.colors import Color
+from reportlab.lib.colors import Color, green, white
 from reportlab.pdfbase.pdfmetrics import stringWidth
 
 from reportlab.pdfbase import pdfmetrics
@@ -95,136 +94,47 @@ def load_annotations(task_json: dict) -> list:
         annots.append({'value': rect, 'text': texts.get(eid, '')})
     return annots
 
-def parse_html_color(col, alpha=None):
-    """
-    解析 HTML/CSS 里的颜色值，返回 reportlab.lib.colors.Color 对象。
 
-    参数
-    ----
-    col : str or tuple or Color
-        - "#RRGGBB" 或 "RRGGBB"（可带/不带 #）
-        - "#RRGGBBAA" 或 "RRGGBBAA"（带透明度通道）
-        - CSS 预定义名字，如 "blue", "lightgreen"
-        - (r, g, b) 三元组，或 (r, g, b, a) 四元组，范围 0–1 或 0–255
-        - 已经是一个 reportlab.lib.colors.Color 实例
-    alpha : float, optional
-        如果传入，这个透明度会覆盖 col 里任何已有的 alpha，范围 0.0–1.0。
-
-    返回
-    ----
-    reportlab.lib.colors.Color
-    """
-    # 如果已经是 Color，直接覆盖 alpha（如果有）
-    if isinstance(col, Color):
-        base = col
-        if alpha is not None:
-            return Color(base.red, base.green, base.blue, alpha=alpha)
-        return base
-
-    # 如果是 元组／列表
-    if isinstance(col, (tuple, list)):
-        vals = list(col)
-        # 如果给的是 0–255，就转换到 0–1
-        if max(vals) > 1:
-            vals = [v/255.0 for v in vals]
-        # 拆成 r,g,b,(a)
-        r, g, b = vals[0], vals[1], vals[2]
-        a = vals[3] if len(vals) == 4 else alpha or 1.0
-        return Color(r, g, b, alpha=a)
-
-    # 到这里，col 应该是字符串
-    s = col.strip().lower()
-
-    # 1) Hex 格式
-    if s.startswith('#') or all(c in '0123456789abcdef' for c in s):
-        hs = s.lstrip('#')
-        # 支持 RRGGBB 或 RRGGBBAA
-        if len(hs) == 6:
-            r8, g8, b8 = int(hs[0:2], 16), int(hs[2:4], 16), int(hs[4:6], 16)
-            a = alpha if alpha is not None else 1.0
-        elif len(hs) == 8:
-            r8, g8, b8 = int(hs[0:2], 16), int(hs[2:4], 16), int(hs[4:6], 16)
-            a8 = int(hs[6:8], 16)
-            a = (alpha if alpha is not None else a8/255.0)
-        else:
-            raise ValueError(f"无效的 hex 长度：{hs!r}")
-        return Color(r8/255.0, g8/255.0, b8/255.0, alpha=a)
-
-    # 2) 预定义名字（找 reportlab.lib.colors）
-    try:
-        base = getattr(colors, s)
-        # 有些名字直接就是 Color 或 HexColor 实例
-        if isinstance(base, Color):
-            return Color(base.red, base.green, base.blue,
-                         alpha=alpha if alpha is not None else getattr(base, 'alpha', 1.0))
-        # 如果不是 Color，就递归一次（万一是 HexColor）
-        return parse_html_color(base, alpha=alpha)
-    except AttributeError:
-        raise ValueError(f"未知的颜色名字：{col!r}")
-      
-
-def annotate_image_to_pdf(img: Image.Image, annots: list, buf: BytesIO):
+def annotate_image_to_pdf(img: Image.Image, annots: list, buf: BytesIO,
+                          bg_alpha: float = 0.6, font_size: float = 10):
     w, h = img.size
     c = canvas.Canvas(buf, pagesize=(w, h))
 
-    # 绘制原图
+    # 用 ImageReader 读取内存中的图片
     img_bio = BytesIO()
     img.save(img_bio, format='PNG')
     img_bio.seek(0)
     reader = ImageReader(img_bio)
     c.drawImage(reader, 0, 0, width=w, height=h)
 
-    # —— 预计算常量 —— #
-    font_size        = 10
-    font_color       = parse_html_color("white", alpha=0.8)
-    padding          = font_size * 0.2
-    # 背景框高度 = 文字 + 上下各 padding
-    bg_h             = font_size + 2 * padding
-
-    box_fill_color   = parse_html_color("green", alpha=0.2)
-    box_stroke_color = parse_html_color("green", alpha=0.2)
-    text_bg_color    = parse_html_color("green", alpha=0.6)
-
     for ann in annots:
-        val  = ann['value']
-        rot  = val.get('rotation', 0)
-
-        # 框中心像素坐标
+        val = ann['value']
+        rot = val.get('rotation', 0)
         xc = (val['x'] / 100) * w
         yc = h - (val['y'] / 100) * h
-        # 框尺寸
-        rect_w = (val['width']  / 100) * w
-        rect_h = (val['height'] / 100) * h
-
+        rect_w = (val['width'] / 100) * w
         text = convert_text_to_meters_text(ann['text'])
-        tw   = stringWidth(text, "DejaVuSans", font_size)
 
         c.saveState()
-        # 1) 平移到框中心
         c.translate(xc, yc)
-        # 2) 旋转到框角度
         c.rotate(-rot)
+        c.translate(rect_w / 2, 0)
 
-        # 3) 绘制半透明框背景（以中心为原点）
-        c.setFillColor(box_fill_color)
-        c.setStrokeColor(box_stroke_color)
-        # 从框中心往左右、上下各扩 rect_w/2、rect_h/2
-        c.rect(-rect_w/2, -rect_h/2, rect_w, rect_h, fill=1, stroke=1)
+        tw = stringWidth(text, "DejaVuSans", font_size)
+        pad = font_size * 0.2
+        bg_w = max(tw + 2 * pad, rect_w)
+        bg_h = font_size + 2 * pad
 
-        # 4) 绘制文字背景框（同样以中心对齐，上方紧贴注释框）
-        #    背景顶边在 rect_h/2 处，底边在 rect_h/2 - bg_h
-        c.setFillColor(text_bg_color)
-        c.rect(-rect_w/2, rect_h/2, rect_w, bg_h, fill=1, stroke=0)
-
-        # 5) 绘制文字（中心对齐 X，Y 在 rect_h/2 + padding）
-        c.setFillColor(font_color)
+        c.setFillColor(Color(green.red, green.green, green.blue, alpha=bg_alpha))
+        c.rect(-bg_w/2, -bg_h/2, bg_w, bg_h, fill=1, stroke=0)
+        c.setFillColor(white)
         c.setFont("DejaVuSans", font_size)
-        c.drawCentredString(0, rect_h/2 + padding - font_size/2, text)
-
+        c.drawCentredString(0, -font_size/2 + pad/2, text)
         c.restoreState()
 
     c.showPage()
     c.save()
+
 
 @app.route('/')
 def index():
