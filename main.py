@@ -176,53 +176,56 @@ def annotate_image_to_pdf(img: Image.Image, annots: list, buf: BytesIO):
 
 
     # —— 配置字体／配色 —— #
-    font_color        = parse_html_color("white", alpha=0.7)
-    font_size         = 10
-    pad               = font_size * 0.2
-    bg_h              = font_size + 2 * pad     # 文字背景高度 = 字体 + 上下各 pad
-
-    box_fill_color    = parse_html_color("green", alpha=0.1)
-    text_bg_color     = parse_html_color("green", alpha=0.5)
-    box_stroke_color  = parse_html_color("green", alpha=0.3)
-
-    # —— 主循环 —— #
+    font_size = 10
+    hpad      = font_size * 0.2   # 文字水平留白
+    vpad      = font_size * 0.3   # 文字垂直留白
+    bg_h      = font_size + 2 * vpad
+    
+    box_fill   = parse_html_color("green", alpha=0.2)
+    box_stroke = parse_html_color("green", alpha=0.2)
+    text_bg    = parse_html_color("green", alpha=0.6)
+    text_color = parse_html_color("white", alpha=0.8)
+    
     for ann in annots:
-        val     = ann['value']
-        rot     = val.get('rotation', 0)
-        # 计算框左下角在 PDF 上的像素坐标
-        x_px     = (val['x']      / 100) * w
-        y_top    = (val['y']      / 100) * h
-        rect_w   = (val['width']  / 100) * w
-        rect_h   = (val['height'] / 100) * h
-        y_px     = h - y_top - rect_h
-
-        # 转换文本并测宽
+        val    = ann['value']
+        rot    = val.get('rotation', 0)
+        x_px    = (val['x']     / 100) * w
+        y_top   = (val['y']     / 100) * h
+        rect_w  = (val['width'] / 100) * w
+        rect_h  = (val['height']/ 100) * h
+        # 下移到左下角：
+        y_px = h - y_top - rect_h
+    
         text = convert_text_to_meters_text(ann['text'])
+        # 这里测 tw 只为后面文字是否超出，但不参与 translate/rect 框本身
         tw   = stringWidth(text, "DejaVuSans", font_size)
-
+    
         c.saveState()
+        # —— 仅这两行控制框的位置和旋转 —— #
         c.translate(x_px, y_px)
         c.rotate(-rot)
-
-        # 1) 绘制注释框背景
-        c.setFillColor(box_fill_color)
-        c.setStrokeColor(box_stroke_color)
+    
+        # 1) 注释框背景
+        c.setFillColor(box_fill)
+        c.setStrokeColor(box_stroke)
         c.rect(0, 0, rect_w, rect_h, fill=1, stroke=1)
-
-        # 2) 绘制文字背景（紧贴顶部，同框宽）
-        c.setFillColor(text_bg_color)
+    
+        # 2) 文字背景框
+        c.setFillColor(text_bg)
         c.rect(0, rect_h, rect_w, bg_h, fill=1, stroke=0)
-
-        # 3) 绘制文字（左对齐，留 pad）
-        c.setFillColor(font_color)
+    
+        # 3) 文字：左对齐，只用 hpad/vpad
+        c.setFillColor(text_color)
         c.setFont("DejaVuSans", font_size)
-        c.drawString(pad, rect_h, text)
+        c.drawString(hpad, rect_h + vpad, text)
 
+        # 恢复角度
         c.restoreState()
 
+    # 显示页面
     c.showPage()
+    # 保存
     c.save()
-
 
 @app.route('/')
 def index():
