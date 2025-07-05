@@ -135,25 +135,20 @@ def convert_length_text(text: str) -> str:
 def convert_bearing_text(text: str) -> str:
     """
     将度分秒格式的文本格式化输出，并在末尾附加十进制度数。
-    支持："D M S" 形式，兼容小数秒，例如 "30 15 20.5"
+    支持:"D M S" 形式，兼容小数秒，例如 "30 15 20.5"
     输出示例： 30° 15′ 20.5″ = 30.256°
     """
-    from decimal import Decimal, getcontext
-
     parts = text.strip().split()
     try:
         d = parts[0]
         m = parts[1] if len(parts) >= 2 else '0'
         s = parts[2] if len(parts) >= 3 else '0'
-        # 格式化 DMS
         dms_str = f"{d}° {m}′ {s}″"
-        # 解析为小数度数
         getcontext().prec = 10
         d_dec = Decimal(d)
         m_dec = Decimal(m)
         s_dec = Decimal(s)
         deg = d_dec + m_dec / Decimal(60) + s_dec / Decimal(3600)
-        # 保留三位小数
         deg_str = f"{deg:.3f}"
         return f"{dms_str} = {deg_str}°"
     except Exception:
@@ -184,7 +179,13 @@ def load_annotations(task_json: dict) -> list:
     return annots
 
 
-def annotate_image_to_pdf(img: Image.Image, annots: list, buf: BytesIO, label_color_map: dict):
+def annotate_image_to_pdf(
+    img: Image.Image,
+    annots: list,
+    buf: BytesIO,
+    label_color_map: dict,
+    pdf_title: str
+):
     w, h = img.size
     max_dim = 6000
     if max(w, h) > max_dim:
@@ -193,6 +194,9 @@ def annotate_image_to_pdf(img: Image.Image, annots: list, buf: BytesIO, label_co
         w, h = img.size
 
     c = canvas.Canvas(buf, pagesize=(w, h), pageCompression=True)
+    # 设置 PDF 文档标题为文件名
+    c.setTitle(pdf_title)
+
     img_bio = BytesIO()
     img.save(img_bio, format='JPEG', quality=80, optimize=True)
     img_bio.seek(0)
@@ -207,9 +211,7 @@ def annotate_image_to_pdf(img: Image.Image, annots: list, buf: BytesIO, label_co
         label = ann.get('label')
         raw_text = ann.get('text', '')
 
-        # 选择并格式化文本
         if label == 'Length':
-            # ⟼
             icon = '↦ '
             text = convert_length_text(raw_text)
         elif label == 'Bearing':
@@ -293,12 +295,16 @@ def download():
 
     annots = load_annotations(task_json)
     pdf_buf = BytesIO()
-    annotate_image_to_pdf(img, annots, pdf_buf, label_color_map)
+    filename = f"{title}[{task_id}].pdf"
+    annotate_image_to_pdf(img, annots, pdf_buf, label_color_map, pdf_title=filename)
     pdf_buf.seek(0)
 
-    filename = f"{title}[{task_id}].pdf"
-    return send_file(pdf_buf, as_attachment=True,
-                     download_name=filename, mimetype='application/pdf')
+    return send_file(
+        pdf_buf,
+        as_attachment=True,
+        download_name=filename,
+        mimetype='application/pdf'
+    )
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.getenv("PORT", 5000)), debug=True)
