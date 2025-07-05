@@ -190,34 +190,46 @@ def annotate_image_to_pdf(img: Image.Image, annots: list, buf: BytesIO):
     for ann in annots:
         val = ann['value']
         rot = val.get('rotation', 0)
-        xc = (val['x'] / 100) * w
-        yc = h - (val['y'] / 100) * h
+        # 1) 计算标注框的左上角在 ReportLab 坐标系中的位置
+        x_px = (val['x'] / 100) * w
+        y_px_top = (val['y'] / 100) * h
         rect_w = (val['width'] / 100) * w
         rect_h = (val['height'] / 100) * h
+        # ReportLab 原点在左下，所以 y 要减掉框高
+        y_px = h - y_px_top - rect_h
+    
         text = convert_text_to_meters_text(ann['text'])
-
-        c.saveState()
-        c.translate(xc, yc)
-        c.rotate(-rot)
-        c.translate(rect_w / 2, 0)
-
         tw = stringWidth(text, "DejaVuSans", font_size)
         pad = font_size * 0.2
         bg_w = max(tw + 2 * pad, rect_w)
         bg_h = font_size + 2 * pad
-
+    
+        c.saveState()
+        # 2) 把原点平移到标注框的左下角
+        c.translate(x_px, y_px)
+        # 3) 围绕左下角做旋转
+        c.rotate(-rot)
+    
+        # —— 绘制整个框的半透明背景 —— #
+        c.setFillColor(parse_html_color(box_bg_color, alpha=box_bg_alpha))
+        c.rect(0, 0, rect_w, rect_h, fill=1, stroke=0)
+    
+        # —— 绘制文字背景 —— #
+        # 我们想把文字背景放在框的上方中央位置
+        tx = rect_w/2 - bg_w/2
+        ty = rect_h + pad  # 让文字框稍微超出标注框顶部
         c.setFillColor(parse_html_color(font_bg_color, alpha=font_bg_alpha))
-        c.rect(-bg_w/2, -bg_h/2, bg_w, bg_h, fill=1, stroke=0)
-
-        c.setFillColor(parse_html_color(box_bg_color, box_bg_alpha))
-        c.setStrokeColor(parse_html_color(box_stroke_color, alpha=box_stroke_alpha))
-        c.rect(-bg_w/2, -bg_h/2, rect_w, rect_h, fill=1, stroke=1)
-      
+        c.rect(tx, ty, bg_w, bg_h, fill=1, stroke=0)
+    
+        # —— 绘制文字 —— #
         c.setFillColor(parse_html_color(font_color, alpha=font_alpha))
         c.setFont("DejaVuSans", font_size)
-        c.drawCentredString(0, -font_size/2 + pad/2, text)
-      
+        # drawString 的坐标是文字左下角
+        c.drawString(tx + pad, ty + pad/2, text)
+    
         c.restoreState()
+
+  
     c.showPage()
     c.save()
 
