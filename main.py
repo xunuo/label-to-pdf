@@ -11,6 +11,7 @@ import os
 import sys
 import requests
 from io import BytesIO
+import re
 from decimal import Decimal, getcontext
 
 from flask import Flask, send_file, jsonify, request
@@ -69,6 +70,16 @@ def parse_html_color(col, alpha=None):
 
 
 def convert_text_to_meters_text(text: str) -> str:
+    """
+    支持以下输入格式：
+      - "155 5 14"    （feet inches frac，不带符号，三部分均数字）
+      - "155' 5 1/4\""
+      - "155'5\""
+      - "155'5 1/4\""
+      - "155' 5\""
+      - 纯数字 "155"
+    """
+    # 映射常见分数到符号
     frac_map = {
         (1,2): '½', (1,3): '⅓', (2,3): '⅔',
         (1,4): '¼', (3,4): '¾',
@@ -77,34 +88,59 @@ def convert_text_to_meters_text(text: str) -> str:
         (1,8): '⅛', (3,8): '⅜', (5,8): '⅝', (7,8): '⅞',
     }
     getcontext().prec = 10
-    FOOT_TO_M = Decimal('0.3048')
+    FOOT_TO_M  = Decimal('0.3048')
     INCH_TO_M = Decimal('0.0254')
+
+    s = text.strip()
     try:
-        parts = text.strip().split()
-        if not 1 <= len(parts) <= 3 or not all(p.isdigit() for p in parts):
-            raise ValueError
-        feet = int(parts[0])
-        inches = int(parts[1]) if len(parts)>=2 else 0
-        frac = int(parts[2]) if len(parts)==3 else 0
-        if frac:
-            s = str(frac)
-            num, den = int(s[:-1]), int(s[-1])
+        # 1) 尝试匹配 带符号的格式：feet'inches frac"
+        m = re.match(r"^(\d+)\s*'\s*(\d+)?(?:\s+(\d+)\s*/\s*(\d+))?\"?$", s)
+        if m:
+            feet = int(m.group(1))
+            inches = int(m.group(2)) if m.group(2) else 0
+            if m.group(3) and m.group(4):
+                num = int(m.group(3))
+                den = int(m.group(4))
+            else:
+                num = den = 0
         else:
-            num = den = 0
-        total_m = Decimal(feet)*FOOT_TO_M + Decimal(inches)*INCH_TO_M
-        if frac:
-            total_m += (Decimal(num)/Decimal(den))*INCH_TO_M
+            # 2) 纯数字拆分：feet inches frac，最多三部分
+            parts = s.split()
+            if not 1 <= len(parts) <= 3 or not all(p.isdigit() for p in parts):
+                raise ValueError
+            feet   = int(parts[0])
+            inches = int(parts[1]) if len(parts) >= 2 else 0
+            if len(parts) == 3:
+                # 最后一部分是 frac，例如 "1/4" 或 "14"
+                if '/' in parts[2]:
+                    num_s, den_s = parts[2].split('/', 1)
+                    num, den = int(num_s), int(den_s)
+                else:
+                    # 如果是连续数字，将最后一位当分母，其余当分子
+                    v = parts[2]
+                    num, den = int(v[:-1]), int(v[-1])
+            else:
+                num = den = 0
+
+        # 计算总米数
+        total_m = Decimal(feet) * FOOT_TO_M + Decimal(inches) * INCH_TO_M
+        if num and den:
+            total_m += (Decimal(num) / Decimal(den)) * INCH_TO_M
+
         meters_str = f"{total_m:.3f}"
+        # 组装结果字符串
         res = f"{feet}'"
-        if inches or frac:
+        if inches or (num and den):
             res += f" {inches}"
-        if frac:
-            res += frac_map.get((num,den), f"{num}/{den}")
-        if inches or frac:
+        if num and den:
+            res += frac_map.get((num, den), f"{num}/{den}")
+        if inches or (num and den):
             res += '"'
         res += f" = {meters_str} m"
         return res
+
     except Exception:
+        # 出错时原样返回
         return text
 
 
