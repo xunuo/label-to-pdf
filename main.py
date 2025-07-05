@@ -205,28 +205,28 @@ def annotate_image_to_pdf(img: Image.Image, annots: list, buf: BytesIO):
         bg_h = font_size + 2 * pad
     
         c.saveState()
-        # 2) 把原点平移到标注框的左下角
         c.translate(x_px, y_px)
-        # 3) 围绕左下角做旋转
         c.rotate(-rot)
-    
-        # —— 绘制整个框的半透明背景 —— #
+        
+        # 1) 整个框的半透明背景
         c.setFillColor(parse_html_color(box_bg_color, alpha=box_bg_alpha))
         c.rect(0, 0, rect_w, rect_h, fill=1, stroke=0)
-    
-        # —— 绘制文字背景 —— #
-        # 我们想把文字背景放在框的上方中央位置
-        tx = rect_w/2 - bg_w/2
-        ty = rect_h + pad  # 让文字框稍微超出标注框顶部
+        
+        # 2) 文字背景，同宽
+        bg_w = rect_w
+        # 放在框顶部
+        tx_bg = 0
+        ty_bg = rect_h + pad
         c.setFillColor(parse_html_color(font_bg_color, alpha=font_bg_alpha))
-        c.rect(tx, ty, bg_w, bg_h, fill=1, stroke=0)
-    
-        # —— 绘制文字 —— #
+        c.rect(tx_bg, ty_bg, bg_w, bg_h, fill=1, stroke=0)
+        
+        # 3) 文字，水平居中
+        text_x = (rect_w - tw) / 2
+        text_y = ty_bg + pad/2
         c.setFillColor(parse_html_color(font_color, alpha=font_alpha))
         c.setFont("DejaVuSans", font_size)
-        # drawString 的坐标是文字左下角
-        c.drawString(tx + pad, ty + pad/2, text)
-    
+        c.drawString(text_x, text_y, text)
+
         c.restoreState()
 
   
