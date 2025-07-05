@@ -20,6 +20,13 @@ from reportlab.lib.utils import ImageReader
 from reportlab.lib.colors import Color, green, white
 from reportlab.pdfbase.pdfmetrics import stringWidth
 
+from reportlab.pdfbase.ttfonts import TTFont
+
+# 在程序初始化时调用一次
+pdfmetrics.registerFont(
+    TTFont("DejaVuSans", "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf")
+)
+
 app = Flask(__name__)
 
 # —— 配置 —— #
@@ -110,7 +117,7 @@ def annotate_image_to_pdf(img: Image.Image, annots: list, buf: BytesIO,
         c.rotate(-rot)
         c.translate(rect_w / 2, 0)
 
-        tw = stringWidth(text, "Helvetica", font_size)
+        tw = stringWidth(text, "DejaVuSans", font_size)
         pad = font_size * 0.2
         bg_w = max(tw + 2 * pad, rect_w)
         bg_h = font_size + 2 * pad
@@ -118,7 +125,7 @@ def annotate_image_to_pdf(img: Image.Image, annots: list, buf: BytesIO,
         c.setFillColor(Color(green.red, green.green, green.blue, alpha=bg_alpha))
         c.rect(-bg_w/2, -bg_h/2, bg_w, bg_h, fill=1, stroke=0)
         c.setFillColor(white)
-        c.setFont("Helvetica", font_size)
+        c.setFont("DejaVuSans", font_size)
         c.drawCentredString(0, -font_size/2 + pad/2, text)
         c.restoreState()
 
