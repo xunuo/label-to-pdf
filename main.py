@@ -89,7 +89,10 @@ def convert_length_text(text: str) -> str:
     """
     将英尺-英寸格式（支持分数）转换为米，并格式化输出。
     示例： 155' 5½" = 47.123 m
-    """
+    如果缺失英尺或英寸，则用 0 补齐，比如:
+    " 5½\"" -> "0' 5½\" ↦ 0.167 m"
+    " 7'"    -> "7' 0\" ↦ 2.134 m"
+    """  
     frac_map = {
         (1, 2): '½', (1, 3): '⅓', (2, 3): '⅔', (1, 4): '¼', (3, 4): '¾',
         (1, 5): '⅕', (2, 5): '⅖', (3, 5): '⅗', (4, 5): '⅘', (1, 6): '⅙',
@@ -98,42 +101,33 @@ def convert_length_text(text: str) -> str:
     getcontext().prec = 10
     FOOT_TO_M = Decimal('0.3048')
     INCH_TO_M = Decimal('0.0254')
+
     s = text.strip()
     try:
-        # 使用三引号原始字符串避免中断
-        m = re.match(r"""^(\d+)\s*'\s*(\d+)?(?:\s+(\d+)\s*/\s*(\d+))?"?$""", s)
-        if m:
-            feet = int(m.group(1))
-            inches = int(m.group(2) or 0)
-            num = int(m.group(3) or 0)
-            den = int(m.group(4) or 0)
-        else:
-            parts = s.split()
-            if not (1 <= len(parts) <= 3):
-                raise ValueError
-            feet = int(parts[0])
-            inches = int(parts[1]) if len(parts) > 1 else 0
-            if len(parts) == 3:
-                if '/' in parts[2]:
-                    num, den = map(int, parts[2].split('/', 1))
-                else:
-                    val = parts[2]
-                    num, den = int(val[:-1]), int(val[-1])
-            else:
-                num = den = 0
+        # 支持可选英尺和英寸以及分数字面
+        pattern = r"""^(?:\s*(?P<feet>\d+)\s*')?\s*(?P<inches>\d+)?(?:\s+(?P<num>\d+)\s*/\s*(?P<den>\d+))?"?\s*$"""
+        m = re.match(pattern, s)
+        if not m:
+            raise ValueError(f"无法解析长度: {text}")
 
+        feet = int(m.group('feet') or 0)
+        inches = int(m.group('inches') or 0)
+        num = int(m.group('num') or 0)
+        den = int(m.group('den') or 0)
+
+        # 计算总米数
         total_m = Decimal(feet) * FOOT_TO_M + Decimal(inches) * INCH_TO_M
         if num and den:
-            total_m += Decimal(num) / Decimal(den) * INCH_TO_M
+            total_m += (Decimal(num) / Decimal(den)) * INCH_TO_M
+
         meter_str = f"{total_m:.3f}"
 
-        orig = f"{feet}'"
-        if inches or (num and den):
-            orig += f" {inches}"
+        # 格式化原始输入显示，缺失部分补零
+        orig = f"{feet}' {inches}"
         if num and den:
             orig += frac_map.get((num, den), f"{num}/{den}")
-        if inches or (num and den):
-            orig += '"'
+        orig += '"'
+
         return f"{orig} ↦ {meter_str} m"
     except Exception:
         return text
@@ -143,16 +137,38 @@ def convert_bearing_text(text: str) -> str:
     """
     将度 分 秒 转换为十进制度数并格式化输出。
     示例： 30° 15′ 20.5″ = 30.256°
-    """
+    如果缺失度、分或秒，使用两位零补齐，比如:
+    "30" -> "30° 00′ 00″ ∢ 30.000°"
+    "" -> "00° 00′ 00″ ∢ 0.000°"
+    "15 5" -> "15° 05′ 00″ ∢ 15.083°"
+    "0 5 3" -> "00° 05′ 03″ ∢ 0.084°"
+    """  
+    # 分隔并解析
     parts = text.strip().split()
     try:
-        d = Decimal(parts[0])
+        # 默认值
+        d = Decimal(parts[0]) if len(parts) > 0 and parts[0] != '' else Decimal(0)
         m = Decimal(parts[1]) if len(parts) > 1 else Decimal(0)
         s = Decimal(parts[2]) if len(parts) > 2 else Decimal(0)
-        dms_str = f"{parts[0]}° {parts[1] if len(parts)>1 else '0'}′ {parts[2] if len(parts)>2 else '0'}″"
+        # 设置精度
         getcontext().prec = 10
+        # 计算十进制度数
         deg = d + m / Decimal(60) + s / Decimal(3600)
-        # ∡∢
+        # 格式化输出，缺失时两位零
+        def pad(value):
+            v_str = str(value)
+            # 切掉可能的小数部分，只保留整数部分的字符串
+            if v_str.isdigit():
+                if len(v_str) == 1:
+                    return '0' + v_str
+                return v_str
+            return v_str
+
+        d_str = pad(int(d))
+        m_str = pad(int(m))
+        s_str = pad(int(s))
+
+        dms_str = f"{d_str}° {m_str}′ {s_str}″"
         return f"{dms_str} ∢ {deg:.3f}°"
     except Exception:
         return text
