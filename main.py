@@ -256,14 +256,32 @@ def download():
     pj = requests.get(f"{LABEL_STUDIO_HOST}/api/projects/{project_id}", headers=headers)
     pj.raise_for_status()
     pj_json = pj.json()
-    title   = pj_json.get('title', f'project_{project_id}')
-    plc     = pj_json.get('parsed_label_config', {}) \
-                  .get('label', {}) \
-                  .get('labels_attrs', {})
+
+    # 调试输出原始 parsed_label_config
+    print("===== DEBUG: parsed_label_config =====")
+    print(pj_json.get('parsed_label_config'))
+    print("======================================")
+
+    title = pj_json.get('title', f'project_{project_id}')
+    plc = pj_json.get('parsed_label_config', {}) \
+                 .get('label', {}) \
+                 .get('labels_attrs', {})
+
+    # 调试输出 labels_attrs
+    print("===== DEBUG: labels_attrs =====")
+    print(plc)
+    print("================================")
+
     label_color_map = {
         lbl: attrs.get('background', '#00ff00')
         for lbl, attrs in plc.items()
     }
+
+    # 调试输出最终的映射
+    print("===== DEBUG: label_color_map =====")
+    print(label_color_map)
+    print("===================================")
+
 
     # 2) 拉取任务
     tj = requests.get(f"{LABEL_STUDIO_HOST}/api/tasks/{task_id}", headers=headers)
