@@ -8,11 +8,11 @@ Flask 应用：一键拉取 Label Studio 私有图像和标注，生成带注释
   label_studio_api_token=<你的 API Token>
 """
 import os
-import requests
-from io import BytesIO
 import re
 from decimal import Decimal, getcontext
+from io import BytesIO
 
+import requests
 from flask import Flask, send_file, jsonify, request
 from PIL import Image
 from reportlab.pdfgen import canvas
@@ -69,15 +69,15 @@ def parse_html_color(col, alpha=None):
         raise ValueError(f"Unknown color name: {col}")
 
 
-def convert_text_to_meters_text(text: str) -> str:
+def convert_length_text(text: str) -> str:
     """
-    支持以下输入格式：
-      - "155 5 14"    （feet inches frac，不带符号，三部分均数字）
+    将英尺英寸格式的文本转换为米，并格式化输出。
+    支持：
+      - "155 5 14" （feet inches frac）
       - "155' 5 1/4\""
       - "155'5\""
-      - "155'5 1/4\""
-      - "155' 5\""
       - 纯数字 "155"
+    输出示例： 155' 5½" = 47.123 m
     """
     frac_map = {
         (1,2): '½', (1,3): '⅓', (2,3): '⅔',
@@ -128,58 +128,51 @@ def convert_text_to_meters_text(text: str) -> str:
             res += '"'
         res += f" = {meters_str} m"
         return res
+    except Exception:
+        return text
 
+
+def convert_bearing_text(text: str) -> str:
+    """
+    将度分秒格式的文本格式化输出。
+    支持："D M S" 形式，兼容小数秒，例如 "30 15 20.5"
+    输出示例： 30° 15′ 20.5″
+    """
+    parts = text.strip().split()
+    try:
+        d = parts[0]
+        m = parts[1] if len(parts) >= 2 else '0'
+        s = parts[2] if len(parts) >= 3 else '0'
+        return f"{d}° {m}′ {s}″"
     except Exception:
         return text
 
 
 def load_annotations(task_json: dict) -> list:
-    """
-    从 task_json['annotations'][0]['result'] 中提取出每个 region 的：
-      - value（坐标）
-      - text（textarea）
-      - label（labels）
-    聚合后返回列表。
-    """
     annots = []
     results = task_json.get('annotations', [{}])[0].get('result', [])
-
-    # 临时按 id 聚合
-    rects  = {}  # id -> value dict（坐标、大小、旋转）
-    texts  = {}  # id -> text str
-    labels = {}  # id -> label str
-
+    rects, texts, labels = {}, {}, {}
     for e in results:
-        eid = e['id']
-        t   = e['type']
-
-        if t == 'rectangle' or t == 'polygon':
+        eid, t = e['id'], e['type']
+        if t in ('rectangle', 'polygon'):
             rects[eid] = e['value']
-
         elif t == 'labels':
-            # e['value']['labels'] 是个列表，通常只有一个元素
             labs = e['value'].get('labels', [])
             if labs:
                 labels[eid] = labs[0]
-
         elif t == 'textarea':
             texts[eid] = ''.join(e['value'].get('text', []))
-
-    # 合并
     for eid, val in rects.items():
         annots.append({
-            'type':  'rectangle',     # 或 'polygon'，如需区分可用 val 里原始 type
+            'type':  'rectangle',
             'value': val,
             'text':  texts.get(eid, ''),
-            'label': labels.get(eid),  # 这里就不会再是 None
+            'label': labels.get(eid),
         })
-
     return annots
 
 
-
 def annotate_image_to_pdf(img: Image.Image, annots: list, buf: BytesIO, label_color_map: dict):
-    # 下采样（可选）
     w, h = img.size
     max_dim = 6000
     if max(w, h) > max_dim:
@@ -187,53 +180,41 @@ def annotate_image_to_pdf(img: Image.Image, annots: list, buf: BytesIO, label_co
         img = img.resize((int(w * ratio), int(h * ratio)), Image.LANCZOS)
         w, h = img.size
 
-    # 创建 PDF Canvas
     c = canvas.Canvas(buf, pagesize=(w, h), pageCompression=True)
     img_bio = BytesIO()
     img.save(img_bio, format='JPEG', quality=80, optimize=True)
     img_bio.seek(0)
-    reader = ImageReader(img_bio)
-    c.drawImage(reader, 0, 0, width=w, height=h)
+    c.drawImage(ImageReader(img_bio), 0, 0, width=w, height=h)
 
-    # 文本样式
     font_size = 10
     padding   = font_size * 0.2
 
     for ann in annots:
-        if ann['type'] not in ('rectangle', 'polygon'):
-            continue
-
+        if ann['type'] not in ('rectangle', 'polygon'): continue
         val   = ann['value']
         label = ann.get('label')
-    
-        # —— 调试信息 —— #
-        print("===== DEBUG ANNOTATION =====")
-        print("type     =", ann['type'])
-        print("label    =", label)
-        # 可选：显示完整的映射表
-        print("label_color_map.get(label)=", label_color_map.get(label))
-        print("full label_color_map =", label_color_map)
-        print("============================")
+        raw_text = ann.get('text', '')
 
+        if label == 'Length':
+            text = convert_length_text(raw_text)
+        elif label == 'Bearing':
+            text = convert_bearing_text(raw_text)
+        else:
+            text = raw_text
 
-        # 获取对应颜色，fallback 为绿色
         bg_col = label_color_map.get(label, "green")
         st_col = label_color_map.get(label, "green")
-
         box_fill_color   = parse_html_color(bg_col, alpha=0.15)
         box_stroke_color = parse_html_color(st_col, alpha=0.5)
         text_bg_color    = parse_html_color(st_col, alpha=0.4)
-        text_bg_stroke  = parse_html_color(st_col, alpha=0.5)
-        font_color      = parse_html_color("white", alpha=0.8)
+        text_bg_stroke   = parse_html_color(st_col, alpha=0.5)
+        font_color       = parse_html_color("white", alpha=0.8)
 
-        # 计算坐标与尺寸
         xc     = (val['x']      / 100) * w
         yc     = h - (val['y']   / 100) * h
         rect_w = (val['width']  / 100) * w
         rect_h = (val['height'] / 100) * h
 
-        # 文本（转换成米标注）
-        text = convert_text_to_meters_text(ann['text'])
         tw   = stringWidth(text, "DejaVuSans", font_size)
         bg_w = max(tw + 2 * padding, rect_w)
         bg_h = font_size + 2 * padding
@@ -244,32 +225,26 @@ def annotate_image_to_pdf(img: Image.Image, annots: list, buf: BytesIO, label_co
         c.rotate(-rot)
         c.translate(rect_w / 2, 0)
 
-        # 绘制标注框
         c.setFillColor(box_fill_color)
         c.setStrokeColor(box_stroke_color)
         c.rect(-rect_w/2, -rect_h, rect_w, rect_h, fill=1, stroke=1)
 
-        # 绘制文字背景
         c.setFillColor(text_bg_color)
         c.setStrokeColor(text_bg_stroke)
         c.rect(-bg_w/2, -rect_h, bg_w, bg_h, fill=1, stroke=1)
 
-        # 绘制文字
         c.setFillColor(font_color)
         c.setFont("DejaVuSans", font_size)
         text_y = -rect_h + font_size/2 - padding/2
         c.drawCentredString(0, text_y, text)
-
         c.restoreState()
 
     c.showPage()
     c.save()
 
-
 @app.route('/')
 def index():
-    return jsonify({"Choo Choo": "Welcome to your Flask app 🚅"})
-
+    return jsonify({"Choo Choo": "Welcome to Xu's Label Studio PDF Exportor 🚅"})
 
 @app.route('/download')
 def download():
@@ -279,44 +254,18 @@ def download():
         return jsonify({"error":"请通过 ?project=<id>&task=<id> 指定参数"}), 400
 
     headers = {'Authorization': f"Token {LABEL_STUDIO_TOKEN}"}
-
-    # 1) 获取项目配置，提取 label→color 映射
     pj = requests.get(f"{LABEL_STUDIO_HOST}/api/projects/{project_id}", headers=headers)
     pj.raise_for_status()
     pj_json = pj.json()
 
-    # 调试输出原始 parsed_label_config
-    print("===== DEBUG: parsed_label_config =====")
-    print(pj_json.get('parsed_label_config'))
-    print("======================================")
-
     title = pj_json.get('title', f'project_{project_id}')
-    plc = pj_json.get('parsed_label_config', {}) \
-                 .get('label', {}) \
-                 .get('labels_attrs', {})
+    plc = pj_json.get('parsed_label_config', {}).get('label', {}).get('labels_attrs', {})
+    label_color_map = { lbl: attrs.get('background', '#00ff00') for lbl, attrs in plc.items() }
 
-    # 调试输出 labels_attrs
-    print("===== DEBUG: labels_attrs =====")
-    print(plc)
-    print("================================")
-
-    label_color_map = {
-        lbl: attrs.get('background', '#00ff00')
-        for lbl, attrs in plc.items()
-    }
-
-    # 调试输出最终的映射
-    print("===== DEBUG: label_color_map =====")
-    print(label_color_map)
-    print("===================================")
-
-
-    # 2) 拉取任务
     tj = requests.get(f"{LABEL_STUDIO_HOST}/api/tasks/{task_id}", headers=headers)
     tj.raise_for_status()
     task_json = tj.json()
 
-    # 3) 获取图像
     ocr_path = task_json.get('data', {}).get('ocr')
     if not ocr_path:
         return jsonify({"error":"Task JSON 中未找到 data['ocr']"}), 500
@@ -324,7 +273,6 @@ def download():
     ir.raise_for_status()
     img = Image.open(BytesIO(ir.content)).convert('RGB')
 
-    # 4) 提取标注 & 生成 PDF
     annots = load_annotations(task_json)
     pdf_buf = BytesIO()
     annotate_image_to_pdf(img, annots, pdf_buf, label_color_map)
@@ -333,7 +281,6 @@ def download():
     filename = f"{title}[{task_id}].pdf"
     return send_file(pdf_buf, as_attachment=True,
                      download_name=filename, mimetype='application/pdf')
-
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.getenv("PORT", 5000)), debug=True)
