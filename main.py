@@ -123,8 +123,7 @@ def load_annotations(task_json: dict) -> list:
     return annots
 
 
-def annotate_image_to_pdf(img: Image.Image, annots: list, buf: BytesIO,
-                          bg_alpha: float = 0.6, font_size: float = 10):
+def annotate_image_to_pdf(img: Image.Image, annots: list, buf: BytesIO):
     # —— 可选：先做下采样 —— #
     w, h = img.size
     max_dim = 6000
