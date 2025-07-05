@@ -125,12 +125,20 @@ def load_annotations(task_json: dict) -> list:
 
 def annotate_image_to_pdf(img: Image.Image, annots: list, buf: BytesIO,
                           bg_alpha: float = 0.6, font_size: float = 10):
+    # —— 可选：先做下采样 —— #
     w, h = img.size
-    c = canvas.Canvas(buf, pagesize=(w, h))
+    max_dim = 6000
+    if max(w, h) > max_dim:
+        ratio = max_dim / max(w, h)
+        img = img.resize((int(w*ratio), int(h*ratio)), Image.LANCZOS)
+        w, h = img.size
 
-    # 底图
+    # Canvas 开启流压缩
+    c = canvas.Canvas(buf, pagesize=(w, h), pageCompression=True)
+
+    # 用 JPEG 嵌入底图
     img_bio = BytesIO()
-    img.save(img_bio, format='PNG')
+    img.save(img_bio, format='JPEG', quality=80, optimize=True)
     img_bio.seek(0)
     reader = ImageReader(img_bio)
     c.drawImage(reader, 0, 0, width=w, height=h)
