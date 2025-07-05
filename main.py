@@ -175,58 +175,51 @@ def annotate_image_to_pdf(img: Image.Image, annots: list, buf: BytesIO):
     c.drawImage(reader, 0, 0, width=w, height=h)
 
 
-    font_color = "white"
-    font_size = 10
-    font_alpha = 0.8
-  
-    font_bg_color = "green"
-    font_bg_alpha = 0.6
+    # —— 配置字体／配色 —— #
+    font_color        = parse_html_color("white", alpha=0.8)
+    font_size         = 10
+    pad               = font_size * 0.2
+    bg_h              = font_size + 2 * pad     # 文字背景高度 = 字体 + 上下各 pad
 
-    box_bg_color = font_bg_color
-    box_bg_alpha = 0.2
-    box_stroke_color = font_bg_color
-    box_stroke_alpha = 0.2
-  
+    box_fill_color    = parse_html_color("green", alpha=0.2)
+    text_bg_color     = parse_html_color("green", alpha=0.6)
+    box_stroke_color  = parse_html_color("green", alpha=0.2)
+
+    # —— 主循环 —— #
     for ann in annots:
-        val = ann['value']
-        rot = val.get('rotation', 0)
-        # 1) 计算标注框的左上角在 ReportLab 坐标系中的位置
-        x_px = (val['x'] / 100) * w
-        y_px_top = (val['y'] / 100) * h
-        rect_w = (val['width'] / 100) * w
-        rect_h = (val['height'] / 100) * h
-        # ReportLab 原点在左下，所以 y 要减掉框高
-        y_px = h - y_px_top - rect_h
-    
+        val     = ann['value']
+        rot     = val.get('rotation', 0)
+        # 计算框左下角在 PDF 上的像素坐标
+        x_px     = (val['x']      / 100) * w
+        y_top    = (val['y']      / 100) * h
+        rect_w   = (val['width']  / 100) * w
+        rect_h   = (val['height'] / 100) * h
+        y_px     = h - y_top - rect_h
+
+        # 转换文本并测宽
         text = convert_text_to_meters_text(ann['text'])
-        tw = stringWidth(text, "DejaVuSans", font_size)
-        pad = font_size * 0.2
-        bg_h = font_size + 2 * pad    # 背景高度 = 字体 + 上下各 pad
-        
+        tw   = stringWidth(text, "DejaVuSans", font_size)
+
         c.saveState()
         c.translate(x_px, y_px)
         c.rotate(-rot)
-        
-        # —— 注释框背景 —— #
-        c.setFillColor(parse_html_color(box_bg_color, alpha=box_bg_alpha))
-        c.rect(0, 0, rect_w, rect_h, fill=1, stroke=0)
-        
-        # —— 文字背景框，紧贴注释框顶部 —— #
-        tx_bg = 0
-        ty_bg = rect_h
-        c.setFillColor(parse_html_color(font_bg_color, alpha=font_bg_alpha))
-        c.rect(tx_bg, ty_bg, rect_w, bg_h, fill=1, stroke=0)
-        
-        # —— 左对齐文字，左右上下各留 pad —— #
-        text_x = pad               # 左侧留一个 pad
-        text_y = ty_bg + pad       # 底部留一个 pad
-        c.setFillColor(parse_html_color(font_color, alpha=font_alpha))
+
+        # 1) 绘制注释框背景
+        c.setFillColor(box_fill_color)
+        c.setStrokeColor(box_stroke_color)
+        c.rect(0, 0, rect_w, rect_h, fill=1, stroke=1)
+
+        # 2) 绘制文字背景（紧贴顶部，同框宽）
+        c.setFillColor(text_bg_color)
+        c.rect(0, rect_h, rect_w, bg_h, fill=1, stroke=0)
+
+        # 3) 绘制文字（左对齐，留 pad）
+        c.setFillColor(font_color)
         c.setFont("DejaVuSans", font_size)
-        c.drawString(text_x, text_y, text)
+        c.drawString(pad, rect_h + pad, text)
 
         c.restoreState()
 
-  
     c.showPage()
     c.save()
 
