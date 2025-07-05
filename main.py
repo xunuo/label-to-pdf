@@ -20,7 +20,9 @@ from reportlab.lib.utils import ImageReader
 from reportlab.lib.colors import Color, green, white
 from reportlab.pdfbase.pdfmetrics import stringWidth
 
+from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
+
 
 BASE_DIR = os.path.dirname(__file__)
 FONT_PATH = os.path.join(BASE_DIR, 'DejaVuSans.ttf')
