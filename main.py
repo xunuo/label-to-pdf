@@ -134,16 +134,28 @@ def convert_length_text(text: str) -> str:
 
 def convert_bearing_text(text: str) -> str:
     """
-    将度分秒格式的文本格式化输出。
+    将度分秒格式的文本格式化输出，并在末尾附加十进制度数。
     支持："D M S" 形式，兼容小数秒，例如 "30 15 20.5"
-    输出示例： 30° 15′ 20.5″
+    输出示例： 30° 15′ 20.5″ = 30.256°
     """
+    from decimal import Decimal, getcontext
+
     parts = text.strip().split()
     try:
         d = parts[0]
         m = parts[1] if len(parts) >= 2 else '0'
         s = parts[2] if len(parts) >= 3 else '0'
-        return f"{d}° {m}′ {s}″"
+        # 格式化 DMS
+        dms_str = f"{d}° {m}′ {s}″"
+        # 解析为小数度数
+        getcontext().prec = 10
+        d_dec = Decimal(d)
+        m_dec = Decimal(m)
+        s_dec = Decimal(s)
+        deg = d_dec + m_dec / Decimal(60) + s_dec / Decimal(3600)
+        # 保留三位小数
+        deg_str = f"{deg:.3f}"
+        return f"{dms_str} = {deg_str}°"
     except Exception:
         return text
 
@@ -197,7 +209,7 @@ def annotate_image_to_pdf(img: Image.Image, annots: list, buf: BytesIO, label_co
 
         # 选择并格式化文本
         if label == 'Length':
-            icon = ''
+            icon = '- '
             text = convert_length_text(raw_text)
         elif label == 'Bearing':
             icon = '∠ '
