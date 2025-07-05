@@ -17,7 +17,8 @@ from flask import Flask, send_file, jsonify, request
 from PIL import Image
 from reportlab.pdfgen import canvas
 from reportlab.lib.utils import ImageReader
-from reportlab.lib.colors import Color, green, white
+from reportlab.lib import colors
+from reportlab.lib.colors import Color
 from reportlab.pdfbase.pdfmetrics import stringWidth
 
 from reportlab.pdfbase import pdfmetrics
@@ -125,13 +126,20 @@ def annotate_image_to_pdf(img: Image.Image, annots: list, buf: BytesIO,
         bg_w = max(tw + 2 * pad, rect_w)
         bg_h = font_size + 2 * pad
 
-        c.setFillColor(Color(green.red, green.green, green.blue, alpha=bg_alpha))
+        bg_color = "green"      # 或者 "red", "green" 等
+        # 从 colors 模块里取出对应的预定义 Color 实例
+        bg_color_object = getattr(colors, bg_color)   # 相当于 colors.blue
+        # 如果你想给它加个 alpha：
+        c.setFillColor(Color(bg_color_object.red, bg_color_object.green, bg_color_object.blue, alpha=bg_alpha))
         c.rect(-bg_w/2, -bg_h/2, bg_w, bg_h, fill=1, stroke=0)
-        c.setFillColor(white)
+
+        font_color = "white"
+        font_color_object = getattr(colors, font_color)
+        c.setFillColor(Color(font_color_object.red, font_color_object.green, font_color_object.blue, alpha=0.9))
         c.setFont("DejaVuSans", font_size)
         c.drawCentredString(0, -font_size/2 + pad/2, text)
+      
         c.restoreState()
-
     c.showPage()
     c.save()
 
