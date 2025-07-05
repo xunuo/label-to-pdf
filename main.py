@@ -1,9 +1,14 @@
+```python
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 Flask 应用：一键拉取 Label Studio 私有图像和标注，生成带注释的 PDF 并下载。
 
-使用前请在环境变量中配置：
+为支持 Unicode 分数字形（如 ⅜），引入 DejaVu Sans 字体。
+请在项目根目录下创建一个 fonts/ 目录，并下载 DejaVuSans.ttf 放入其中：
+  https://github.com/dejavu-fonts/dejavu-fonts/blob/master/ttf/DejaVuSans.ttf
+
+环境变量：
   label_studio_host=https://itag.app
   label_studio_api_token=<你的 API Token>
 """
@@ -18,25 +23,34 @@ from PIL import Image
 from reportlab.pdfgen import canvas
 from reportlab.lib.utils import ImageReader
 from reportlab.lib.colors import Color, green, white
-from reportlab.pdfbase.pdfmetrics import stringWidth
+from reportlab.pdfbase.pdfmetrics import stringWidth, registerFont
+from reportlab.pdfbase.ttfonts import TTFont
 
 app = Flask(__name__)
 
-# —— 配置 —— #
+# ——— 配置 ——— #
 LABEL_STUDIO_HOST  = os.getenv('label_studio_host', 'https://itag.app')
 LABEL_STUDIO_TOKEN = os.getenv('label_studio_api_token')
 if not LABEL_STUDIO_TOKEN:
-    raise RuntimeError("请先在环境变量中配置 label_studio_api_token")
-# —————— #
+    print("ERROR: 环境变量 label_studio_api_token 未配置！", file=sys.stderr)
+    sys.exit(1)
+# —————————— #
+
+# 注册 DejaVu Sans 用于支持 Unicode 包括分数字形
+FONT_PATH = os.path.join(os.path.dirname(__file__), 'fonts', 'DejaVuSans.ttf')
+if not os.path.isfile(FONT_PATH):
+    print(f"ERROR: 找不到字体文件：{FONT_PATH}", file=sys.stderr)
+    sys.exit(1)
+registerFont(TTFont("DejaVuSans", FONT_PATH))
 
 
 def convert_text_to_meters_text(text: str) -> str:
     frac_map = {
-        (1, 2): '½', (1, 3): '⅓', (2, 3): '⅔',
-        (1, 4): '¼', (3, 4): '¾',
-        (1, 5): '⅕', (2, 5): '⅖', (3, 5): '⅗', (4, 5): '⅘',
-        (1, 6): '⅙', (5, 6): '⅚',
-        (1, 8): '⅛', (3, 8): '⅜', (5, 8): '⅝', (7, 8): '⅞',
+        (1,2): '½', (1,3): '⅓', (2,3): '⅔',
+        (1,4): '¼', (3,4): '¾',
+        (1,5): '⅕', (2,5): '⅖', (3,5): '⅗', (4,5): '⅘',
+        (1,6): '⅙', (5,6): '⅚',
+        (1,8): '⅛', (3,8): '⅜', (5,8): '⅝', (7,8): '⅞',
     }
     getcontext().prec = 10
     FOOT_TO_M = Decimal('0.3048')
@@ -71,15 +85,14 @@ def convert_text_to_meters_text(text: str) -> str:
 
 
 def load_annotations(task_json: dict) -> list:
-    annots = []
     results = task_json.get('annotations', [])[0].get('result', [])
     rects, texts = {}, {}
     for e in results:
-        eid = e['id']
         if e['type'] == 'rectangle':
-            rects[eid] = e['value']
+            rects[e['id']] = e['value']
         elif e['type'] == 'textarea':
-            texts[eid] = ''.join(e['value'].get('text', []))
+            texts[e['id']] = ''.join(e['value'].get('text', []))
+    annots = []
     for eid, rect in rects.items():
         annots.append({'value': rect, 'text': texts.get(eid, '')})
     return annots
@@ -90,7 +103,7 @@ def annotate_image_to_pdf(img: Image.Image, annots: list, buf: BytesIO,
     w, h = img.size
     c = canvas.Canvas(buf, pagesize=(w, h))
 
-    # 用 ImageReader 读取内存中的图片
+    # 绘制原图
     img_bio = BytesIO()
     img.save(img_bio, format='PNG')
     img_bio.seek(0)
@@ -110,7 +123,7 @@ def annotate_image_to_pdf(img: Image.Image, annots: list, buf: BytesIO,
         c.rotate(-rot)
         c.translate(rect_w / 2, 0)
 
-        tw = stringWidth(text, "Helvetica", font_size)
+        tw = stringWidth(text, "DejaVuSans", font_size)
         pad = font_size * 0.2
         bg_w = max(tw + 2 * pad, rect_w)
         bg_h = font_size + 2 * pad
@@ -118,7 +131,7 @@ def annotate_image_to_pdf(img: Image.Image, annots: list, buf: BytesIO,
         c.setFillColor(Color(green.red, green.green, green.blue, alpha=bg_alpha))
         c.rect(-bg_w/2, -bg_h/2, bg_w, bg_h, fill=1, stroke=0)
         c.setFillColor(white)
-        c.setFont("Helvetica", font_size)
+        c.setFont("DejaVuSans", font_size)
         c.drawCentredString(0, -font_size/2 + pad/2, text)
         c.restoreState()
 
@@ -140,20 +153,14 @@ def download():
 
     headers = {'Authorization': f"Token {LABEL_STUDIO_TOKEN}"}
 
-    # 获取 Project title
+    # 获取项目标题
     pj = requests.get(f"{LABEL_STUDIO_HOST}/api/projects/{project_id}", headers=headers)
-    try:
-        pj.raise_for_status()
-        title = pj.json().get('title', f'project_{project_id}')
-    except requests.HTTPError as e:
-        return jsonify({"error": "获取 Project 失败", "details": str(e)}), pj.status_code
+    pj.raise_for_status()
+    title = pj.json().get('title', f'project_{project_id}')
 
     # 获取 Task JSON
     tj = requests.get(f"{LABEL_STUDIO_HOST}/api/tasks/{task_id}", headers=headers)
-    try:
-        tj.raise_for_status()
-    except requests.HTTPError as e:
-        return jsonify({"error": "获取 Task 失败", "details": str(e)}), tj.status_code
+    tj.raise_for_status()
     task_json = tj.json()
 
     # 下载 OCR 图像
@@ -161,19 +168,15 @@ def download():
     if not ocr_path:
         return jsonify({"error": "Task JSON 中未找到 data['ocr']"}), 500
     ir = requests.get(f"{LABEL_STUDIO_HOST}{ocr_path}", headers=headers)
-    try:
-        ir.raise_for_status()
-    except requests.HTTPError as e:
-        return jsonify({"error": "下载图像失败", "details": str(e)}), ir.status_code
+    ir.raise_for_status()
     img = Image.open(BytesIO(ir.content)).convert('RGB')
 
-    # 渲染注释到 PDF
+    # 渲染标注到 PDF
     annots = load_annotations(task_json)
     pdf_buf = BytesIO()
     annotate_image_to_pdf(img, annots, pdf_buf)
     pdf_buf.seek(0)
 
-    # 触发下载
     filename = f"{title}.pdf"
     return send_file(
         pdf_buf,
@@ -187,5 +190,6 @@ if __name__ == '__main__':
     app.run(
         host='0.0.0.0',
         port=int(os.getenv("PORT", 5000)),
-        debug=True
+        debug=False
     )
+```
