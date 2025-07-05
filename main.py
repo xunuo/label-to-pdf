@@ -6,53 +6,77 @@ from PIL import Image
 
 app = Flask(__name__)
 
+LS_HOST = "https://itag.app"
+LS_TOKEN = os.getenv('label_studio_api_token')
+if not LS_TOKEN:
+    raise RuntimeError("请先在环境变量中配置 label_studio_api_token")
+
 @app.route('/')
 def index():
     return jsonify({"Choo Choo": "Welcome to your Flask app 🚅"})
 
 @app.route('/download')
 def download():
-    # 1. 从 query 参数或默认值拿到要拉取的图片 URL
+    # 1. 获取 project ID
+    project_id = request.args.get('project')
+    if not project_id:
+        return jsonify({"error": "请通过 ?project=<id> 指定项目 ID"}), 400
+
+    headers = {'Authorization': f'Token {LS_TOKEN}'}
+
+    # 2. 调用 Projects API，取 title
+    proj_api = f"{LS_HOST}/api/projects/{project_id}"
+    proj_resp = requests.get(proj_api, headers=headers)
+    try:
+        proj_resp.raise_for_status()
+    except requests.HTTPError as e:
+        return jsonify({
+            "error": "无法获取 Project 信息",
+            "status_code": proj_resp.status_code,
+            "details": str(e)
+        }), proj_resp.status_code
+
+    title = proj_resp.json().get('title', f'project_{project_id}')
+
+    # 3. 获取图片 URL（支持传参覆盖）
     image_url = request.args.get(
         'url',
         'https://itag.app/data/upload/1/e5660918-15723dp-images-1.jpg'
     )
-    # 2. 从环境变量读取 Label Studio API Key
-    ls_token = os.getenv('label_studio_api_token')
-    if not ls_token:
-        return jsonify({"error": "Label Studio API token not configured"}), 500
 
-    # 3. 发起带鉴权的请求
-    headers = {
-        'Authorization': f'Token {ls_token}'
-    }
-    resp = requests.get(image_url, headers=headers)
+    # 4. 下载图片
+    img_resp = requests.get(image_url, headers=headers)
     try:
-        resp.raise_for_status()
+        img_resp.raise_for_status()
     except requests.HTTPError as e:
         return jsonify({
-            "error": "Failed to fetch image from Label Studio",
-            "status_code": resp.status_code,
+            "error": "下载图片失败",
+            "status_code": img_resp.status_code,
             "details": str(e)
-        }), resp.status_code
+        }), img_resp.status_code
 
-    # 4. 用 Pillow 打开图片并转为 RGB
-    img = Image.open(BytesIO(resp.content))
+    # 5. 用 Pillow 打开并转为 RGB
+    img = Image.open(BytesIO(img_resp.content))
     if img.mode in ('RGBA', 'LA'):
         img = img.convert('RGB')
 
-    # 5. 在内存中生成 PDF
+    # 6. 在内存生成 PDF
     pdf_buffer = BytesIO()
     img.save(pdf_buffer, format='PDF', resolution=100.0)
     pdf_buffer.seek(0)
 
-    # 6. 返回 PDF 给客户端
+    # 7. 返回 PDF，文件名为 <title>.pdf
+    filename = f"{title}.pdf"
     return send_file(
         pdf_buffer,
         as_attachment=True,
-        download_name='image.pdf',
+        download_name=filename,
         mimetype='application/pdf'
     )
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=int(os.getenv("PORT", 5000)), debug=True)
+    app.run(
+        host='0.0.0.0',
+        port=int(os.getenv("PORT", 5000)),
+        debug=True
+    )
