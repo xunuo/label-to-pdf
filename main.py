@@ -95,9 +95,75 @@ def load_annotations(task_json: dict) -> list:
         annots.append({'value': rect, 'text': texts.get(eid, '')})
     return annots
 
+def parse_html_color(col, alpha=None):
+    """
+    解析 HTML/CSS 里的颜色值，返回 reportlab.lib.colors.Color 对象。
 
-def annotate_image_to_pdf(img: Image.Image, annots: list, buf: BytesIO,
-                          bg_alpha: float = 0.6, font_size: float = 10):
+    参数
+    ----
+    col : str or tuple or Color
+        - "#RRGGBB" 或 "RRGGBB"（可带/不带 #）
+        - "#RRGGBBAA" 或 "RRGGBBAA"（带透明度通道）
+        - CSS 预定义名字，如 "blue", "lightgreen"
+        - (r, g, b) 三元组，或 (r, g, b, a) 四元组，范围 0–1 或 0–255
+        - 已经是一个 reportlab.lib.colors.Color 实例
+    alpha : float, optional
+        如果传入，这个透明度会覆盖 col 里任何已有的 alpha，范围 0.0–1.0。
+
+    返回
+    ----
+    reportlab.lib.colors.Color
+    """
+    # 如果已经是 Color，直接覆盖 alpha（如果有）
+    if isinstance(col, Color):
+        base = col
+        if alpha is not None:
+            return Color(base.red, base.green, base.blue, alpha=alpha)
+        return base
+
+    # 如果是 元组／列表
+    if isinstance(col, (tuple, list)):
+        vals = list(col)
+        # 如果给的是 0–255，就转换到 0–1
+        if max(vals) > 1:
+            vals = [v/255.0 for v in vals]
+        # 拆成 r,g,b,(a)
+        r, g, b = vals[0], vals[1], vals[2]
+        a = vals[3] if len(vals) == 4 else alpha or 1.0
+        return Color(r, g, b, alpha=a)
+
+    # 到这里，col 应该是字符串
+    s = col.strip().lower()
+
+    # 1) Hex 格式
+    if s.startswith('#') or all(c in '0123456789abcdef' for c in s):
+        hs = s.lstrip('#')
+        # 支持 RRGGBB 或 RRGGBBAA
+        if len(hs) == 6:
+            r8, g8, b8 = int(hs[0:2], 16), int(hs[2:4], 16), int(hs[4:6], 16)
+            a = alpha if alpha is not None else 1.0
+        elif len(hs) == 8:
+            r8, g8, b8 = int(hs[0:2], 16), int(hs[2:4], 16), int(hs[4:6], 16)
+            a8 = int(hs[6:8], 16)
+            a = (alpha if alpha is not None else a8/255.0)
+        else:
+            raise ValueError(f"无效的 hex 长度：{hs!r}")
+        return Color(r8/255.0, g8/255.0, b8/255.0, alpha=a)
+
+    # 2) 预定义名字（找 reportlab.lib.colors）
+    try:
+        base = getattr(colors, s)
+        # 有些名字直接就是 Color 或 HexColor 实例
+        if isinstance(base, Color):
+            return Color(base.red, base.green, base.blue,
+                         alpha=alpha if alpha is not None else getattr(base, 'alpha', 1.0))
+        # 如果不是 Color，就递归一次（万一是 HexColor）
+        return parse_html_color(base, alpha=alpha)
+    except AttributeError:
+        raise ValueError(f"未知的颜色名字：{col!r}")
+      
+
+def annotate_image_to_pdf(img: Image.Image, annots: list, buf: BytesIO):
     w, h = img.size
     c = canvas.Canvas(buf, pagesize=(w, h))
 
@@ -108,6 +174,14 @@ def annotate_image_to_pdf(img: Image.Image, annots: list, buf: BytesIO,
     reader = ImageReader(img_bio)
     c.drawImage(reader, 0, 0, width=w, height=h)
 
+
+    font_color = "white"
+    font_size = 10
+    font_alpha = 0.8
+  
+    bg_color = "green"
+    bg_alpha = 0.6
+  
     for ann in annots:
         val = ann['value']
         rot = val.get('rotation', 0)
@@ -126,16 +200,10 @@ def annotate_image_to_pdf(img: Image.Image, annots: list, buf: BytesIO,
         bg_w = max(tw + 2 * pad, rect_w)
         bg_h = font_size + 2 * pad
 
-        bg_color = "green"      # 或者 "red", "green" 等
-        # 从 colors 模块里取出对应的预定义 Color 实例
-        bg_color_object = getattr(colors, bg_color)   # 相当于 colors.blue
-        # 如果你想给它加个 alpha：
-        c.setFillColor(Color(bg_color_object.red, bg_color_object.green, bg_color_object.blue, alpha=bg_alpha))
-        c.rect(-bg_w/2, -bg_h/2, bg_w, bg_h, fill=1, stroke=0)
+        c.setFillColor(parse_html_color(bg_color, alpha=bg_alpha))
+        c.rect(-bg_w/2, -bg_h/2, bg_w, bg_h, fill=1, stroke=1)
 
-        font_color = "white"
-        font_color_object = getattr(colors, font_color)
-        c.setFillColor(Color(font_color_object.red, font_color_object.green, font_color_object.blue, alpha=0.9))
+        c.setFillColor(parse_html_color(font_color, alpha=font_alpha))
         c.setFont("DejaVuSans", font_size)
         c.drawCentredString(0, -font_size/2 + pad/2, text)
       
