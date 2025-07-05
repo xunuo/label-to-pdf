@@ -216,7 +216,7 @@ def annotate_image_to_pdf(img: Image.Image, annots: list, buf: BytesIO):
         # 3) 绘制文字（左对齐，留 pad）
         c.setFillColor(font_color)
         c.setFont("DejaVuSans", font_size)
-        c.drawString(pad, rect_h + pad, text)
+        c.drawString(pad, rect_h, text)
 
         c.restoreState()
 
