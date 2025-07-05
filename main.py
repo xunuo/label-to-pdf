@@ -10,8 +10,8 @@ app = Flask(__name__)
 def index():
     return jsonify({"Choo Choo": "Welcome to your Flask app 🚅"})
 
-@app.route('/download_pdf')
-def download_pdf():
+@app.route('/download')
+def download():
     # 1. 从 query 参数或默认值拿到要拉取的图片 URL
     image_url = request.args.get(
         'url',
