@@ -187,6 +187,16 @@ def annotate_image_to_pdf(img: Image.Image, annots: list, buf: BytesIO, label_co
 
         val   = ann['value']
         label = ann.get('label')
+    
+        # —— 调试信息 —— #
+        print("===== DEBUG ANNOTATION =====")
+        print("type     =", ann['type'])
+        print("label    =", label)
+        # 可选：显示完整的映射表
+        print("label_color_map.get(label)=", label_color_map.get(label))
+        print("full label_color_map =", label_color_map)
+        print("============================")
+
 
         # 获取对应颜色，fallback 为绿色
         bg_col = label_color_map.get(label, "#00ff00")
