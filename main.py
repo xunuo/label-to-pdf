@@ -223,14 +223,12 @@ def annotate_image_to_pdf(
         label = ann.get('label')
         raw = ann.get('text', '')
 
-        # if label == 'Length':
-        #     disp = '↦ ' + convert_length_text(raw)
-        # elif label == 'Bearing':
-        #     disp = '∠ ' + convert_bearing_text(raw)
-        # else:
-        #     disp = raw
-      
-        disp = raw
+        if label == 'Length':
+            disp = convert_length_text(raw)
+        elif label == 'Bearing':
+            disp = convert_bearing_text(raw)
+        else:
+            disp = raw
 
         base_col = color_map.get(label, '#00ff00')
         fill_col = parse_html_color(base_col, alpha=0.15)
