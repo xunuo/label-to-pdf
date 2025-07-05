@@ -89,12 +89,14 @@ def convert_length_text(text: str) -> str:
     """
     将英尺英寸格式的文本转换为米，并格式化输出。
     支持：
-      - 含引号的各种格式，如 "155' 5 1/4\"", "155'5\""
-      - 纯数字 “50”（视作 50 英尺）
-      - 三部分简写 “159 0 12”（视作 159' 0½"")
-      - 只写英寸或分数，如 “5 1/2\"”、"1/2\""
-    输出示例： 5' 0" = 1.524 m
+      - 含引号的格式，如 155' 5 1/4", 155'5"
+      - 纯数字 "50"（视作 50 英尺）
+      - 简写三段 "159 0 12"（12 表示 1/2）
+      - 只有英寸或分数，如 5 1/2", 1/2"
+    输出示例： 5' 0" ↦ 1.524m
+    解析失败则返回原文本。
     """
+    # 分数到 Unicode 的映射
     frac_map = {
         (1,2): '½', (1,3): '⅓', (2,3): '⅔',
         (1,4): '¼', (3,4): '¾',
@@ -103,85 +105,52 @@ def convert_length_text(text: str) -> str:
         (1,8): '⅛', (3,8): '⅜', (5,8): '⅝', (7,8): '⅞',
     }
     getcontext().prec = 10
-    FOOT_TO_M  = Decimal('0.3048')
+    FOOT_TO_M = Decimal('0.3048')
     INCH_TO_M = Decimal('0.0254')
 
     s = text.strip()
 
-    # —— 1. 纯数字或三段简写  —— #
-    parts = s.split()
-    if all(p.isdigit() for p in parts) and 1 <= len(parts) <= 3:
+    # ——— 1. 纯数字/三段简写 ———
+    parts = s.replace('"','').split()
+    if 1 <= len(parts) <= 3 and all(p.isdigit() for p in parts):
         feet = int(parts[0])
         inches = int(parts[1]) if len(parts) >= 2 else 0
-        numerator = denominator = 0
-        frac_text = ''
-        if len(parts) == 3 and int(parts[2]) != 0:
-            # 简写的 frac: e.g. "12" -> 1/2, "25"->2/5
-            frac_code = parts[2]
-            numerator, denominator = int(frac_code[:-1]), int(frac_code[-1])
-            frac_text = frac_map.get((numerator, denominator), f"{numerator}/{denominator}")
-        # 计算米
-        total_m = Decimal(feet)*FOOT_TO_M + Decimal(inches)*INCH_TO_M
-        if denominator:
-            total_m += (Decimal(numerator)/Decimal(denominator))*INCH_TO_M
-        meters_str = f"{total_m:.3f}"
-        # 始终显示英寸，即使为 0
-        result = f"{feet}' {inches}{frac_text}\" = {meters_str} m"
-        return result
-
-    # —— 2. 含引号或复杂格式 —— #
-    try:
+        num = den = 0
+        if len(parts) == 3 and parts[2] != '0':
+            code = parts[2]
+            num, den = int(code[:-1]), int(code[-1])
+        # 后面走统一的计算/格式化
+    else:
+        # ——— 2. 引号/复杂格式 ———
+        # 一次性抓取：英尺、英寸整数、分子、分母
         m = re.match(
             r"""^\s*
-                (?:(\d+)\s*')?               # feet
-                \s*(\d+)?                     # inches
-                (?:\s*(\d+)\s*/\s*(\d+))?  # fraction
+                (?:(\d+)\s*')?            # group1: feet
+                \s*(\d+)?                 # group2: inches integer
+                (?:\s+(\d+)\s*/\s*(\d+))? # group3/4: fraction
                 \s*"?\s*$""",
             s, re.VERBOSE
         )
-        if m:
-            feet   = int(m.group(1)) if m.group(1) else 0
-            inches = int(m.group(2)) if m.group(2) else 0
-            num    = int(m.group(3)) if m.group(3) else 0
-            den    = int(m.group(4)) if m.group(4) else 0
-        else:
-            parts = s.split()
-            if not 1 <= len(parts) <= 3:
-                raise ValueError
-            if '/' in parts[0] and len(parts) == 1:
-                feet = inches = 0
-                num_s, den_s = parts[0].split('/', 1)
-                num, den = int(num_s), int(den_s)
-            else:
-                if len(parts) == 1:
-                    feet, inches, num, den = int(parts[0]), 0, 0, 0
-                elif len(parts) == 2:
-                    if '/' not in parts[1]:
-                        feet, inches, num, den = int(parts[0]), int(parts[1]), 0, 0
-                    else:
-                        feet = inches = 0
-                        n_s, d_s = parts[1].split('/', 1)
-                        num, den = int(n_s), int(d_s)
-                else:
-                    feet, inches = int(parts[0]), int(parts[1])
-                    if '/' in parts[2]:
-                        n_s, d_s = parts[2].split('/', 1)
-                        num, den = int(n_s), int(d_s)
-                    else:
-                        num, den = int(parts[2][:-1]), int(parts[2][-1])
-        # 计算米
-        total_m = Decimal(feet)*FOOT_TO_M + Decimal(inches)*INCH_TO_M
-        if num and den:
-            total_m += (Decimal(num)/Decimal(den))*INCH_TO_M
-        meters_str = f"{total_m:.3f}"
+        if not m:
+            return text  # 无法解析，原样返回
+        feet   = int(m.group(1)) if m.group(1) else 0
+        inches = int(m.group(2)) if m.group(2) else 0
+        num    = int(m.group(3)) if m.group(3) else 0
+        den    = int(m.group(4)) if m.group(4) else 0
 
-        # 格式化输出
-        frac_text = frac_map.get((num, den), f"{num}/{den}") if num and den else ''
-        result = f"{feet}' {inches}{frac_text}\" ↦ {meters_str}m"
-        return result
+    # ——— 统一计算米值 ———
+    total_m = (
+        Decimal(feet) * FOOT_TO_M +
+        Decimal(inches) * INCH_TO_M +
+        (Decimal(num) / Decimal(den) * INCH_TO_M if den else Decimal(0))
+    )
+    meters_str = f"{total_m:.3f}"
 
-    except Exception:
-        return text
+    # ——— 构造输出中的分数字符 & 英寸文本 ———
+    frac_txt = frac_map.get((num, den), f"{num}/{den}") if den else ''
+    inch_txt = f'{inches}{frac_txt}"'
+
+    return f"{feet}' {inch_txt} ↦ {meters_str}m"
 
       
 
