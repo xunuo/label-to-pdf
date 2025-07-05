@@ -263,7 +263,7 @@ def download():
     annotate_image_to_pdf(img, annots, pdf_buf)
     pdf_buf.seek(0)
 
-    filename = f"{title}.pdf"
+    filename = f"{title}_{task_id}.pdf"
     return send_file(pdf_buf, as_attachment=True,
                      download_name=filename,mimetype='application/pdf')
 
