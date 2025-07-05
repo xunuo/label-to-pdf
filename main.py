@@ -136,13 +136,13 @@ def annotate_image_to_pdf(img: Image.Image, annots: list, buf: BytesIO,
     c.drawImage(reader, 0, 0, width=w, height=h)
 
     # 样式预计算
-    font_color       = parse_html_color("white", alpha=0.7)
+    font_color       = parse_html_color("white", alpha=0.8)
     padding          = font_size * 0.2
     bg_h             = font_size + 2 * padding
     box_fill_color   = parse_html_color("green", alpha=0.2)
     box_stroke_color = parse_html_color("green", alpha=0.3)
     text_bg_color    = parse_html_color("green", alpha=0.4)
-    text_bg_stroke_color   = parse_html_color("darkgreen", alpha=0.5)
+    text_bg_stroke_color   = parse_html_color("green", alpha=0.5)
                             
     for ann in annots:
         val    = ann['value']
@@ -177,7 +177,7 @@ def annotate_image_to_pdf(img: Image.Image, annots: list, buf: BytesIO,
         # 渲染文字（水平 & 垂直居中于文字背景）
         c.setFillColor(font_color)
         c.setFont("DejaVuSans", font_size)
-        text_y = -rect_h + padding
+        text_y = -rect_h + font_size/2
         c.drawCentredString(0, text_y, text)
 
         c.restoreState()
