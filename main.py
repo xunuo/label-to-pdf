@@ -88,11 +88,13 @@ def parse_html_color(color_val, alpha=None):
 def convert_length_text(text: str) -> str:
     """
     将英尺-英寸格式（支持分数）转换为米，并格式化输出。
-    示例： 155' 5½" = 47.123 m
-    如果缺失英尺或英寸，则用 0 补齐，比如:
-    " 5½\"" -> "0' 5½\" ↦ 0.167 m"
-    " 7'"    -> "7' 0\" ↦ 2.134 m"
-    """  
+    示例：
+      155' 5½" = 47.123 m
+      如果缺失英尺或英寸，则用0补齐，比如:
+      "5½\""  -> "0' 5½\" ↦ 0.167 m"
+      "7'"     -> "7' 0\" ↦ 2.134 m"
+      单数字(无符号)如"5" -> "5' 0\" ↦ 1.524 m"
+    """
     frac_map = {
         (1, 2): '½', (1, 3): '⅓', (2, 3): '⅔', (1, 4): '¼', (3, 4): '¾',
         (1, 5): '⅕', (2, 5): '⅖', (3, 5): '⅗', (4, 5): '⅘', (1, 6): '⅙',
@@ -104,25 +106,28 @@ def convert_length_text(text: str) -> str:
 
     s = text.strip()
     try:
-        # 支持可选英尺和英寸以及分数字面
-        pattern = r"""^(?:\s*(?P<feet>\d+)\s*')?\s*(?P<inches>\d+)?(?:\s+(?P<num>\d+)\s*/\s*(?P<den>\d+))?"?\s*$"""
-        m = re.match(pattern, s)
-        if not m:
-            raise ValueError(f"无法解析长度: {text}")
-
-        feet = int(m.group('feet') or 0)
-        inches = int(m.group('inches') or 0)
-        num = int(m.group('num') or 0)
-        den = int(m.group('den') or 0)
+        # 仅数字无符号情况下当作英尺处理
+        if re.fullmatch(r"\d+", s):
+            feet = int(s)
+            inches = num = den = 0
+        else:
+            # 支持可选英尺(')和可选英寸数字及可选分数，末尾可带双引号(")
+            pattern = r'^(?:\s*(?P<feet>\d+)\s*\'\s*)?(?P<inches>\d+)?(?:\s+(?P<num>\d+)\s*/\s*(?P<den>\d+))?"?\s*$'
+            m = re.match(pattern, s)
+            if not m:
+                raise ValueError(f"无法解析长度: {text}")
+            feet = int(m.group('feet') or 0)
+            inches = int(m.group('inches') or 0)
+            num = int(m.group('num') or 0)
+            den = int(m.group('den') or 0)
 
         # 计算总米数
         total_m = Decimal(feet) * FOOT_TO_M + Decimal(inches) * INCH_TO_M
         if num and den:
             total_m += (Decimal(num) / Decimal(den)) * INCH_TO_M
-
         meter_str = f"{total_m:.3f}"
 
-        # 格式化原始输入显示，缺失部分补零
+        # 格式化原始输入显示
         orig = f"{feet}' {inches}"
         if num and den:
             orig += frac_map.get((num, den), f"{num}/{den}")
