@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Flask 应用：一键拉取 Label Studio 私有图像和标注，生成带注释的 PDF 并下载。
+一键拉取 Label Studio 私有图像和标注，生成带注释的 PDF 并下载。
 
 使用前请在环境变量中配置：
-  LABEL_STUDIO_HOST=https://itag.app
-  LABEL_STUDIO_TOKEN=<你的 API Token>
+  label_studio_host
+  label_studio_api_token
 
 所有时间将转换为澳大利亚悉尼时间（AEST/AEDT）。
 """
@@ -31,7 +31,7 @@ from dateutil import parser, tz
 app = Flask(__name__)
 
 # 环境变量配置
-LABEL_STUDIO_HOST  = os.getenv('label_studio_host', 'https://itag.app')
+LABEL_STUDIO_HOST  = os.getenv('label_studio_host')
 LABEL_STUDIO_TOKEN = os.getenv('label_studio_api_token')
 if not LABEL_STUDIO_TOKEN:
     raise RuntimeError("请先配置环境变量：LABEL_STUDIO_TOKEN")
