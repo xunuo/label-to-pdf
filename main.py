@@ -7,7 +7,7 @@
   label_studio_host
   label_studio_api_token
 
-所有时间将转换为澳大利亚悉尼时间（AEST/AEDT）。
+所有时间为澳大利亚悉尼时间（AEST/AEDT）。
 """
 import os
 import re
