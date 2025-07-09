@@ -96,9 +96,6 @@ def convert_length_text(text: str) -> dict[str, str]:
     输出示例： 5' 0" ↦ 1.524 m
     解析失败则返回原文本。
     """
-    from decimal import Decimal, getcontext
-    import re
-
     # 分数到 Unicode 的映射
     frac_map = {
         (1,2): '½', (1,3): '⅓', (2,3): '⅔',
@@ -122,6 +119,7 @@ def convert_length_text(text: str) -> dict[str, str]:
         if len(parts) == 3 and parts[2] != '0':
             code = parts[2]
             num, den = int(code[:-1]), int(code[-1])
+        # 后面走统一的计算/格式化
     else:
         # ——— 2. 引号/复杂格式 ———
         # 一次性抓取：英尺、英寸整数、分子、分母
@@ -134,7 +132,7 @@ def convert_length_text(text: str) -> dict[str, str]:
             s, re.VERBOSE
         )
         if not m:
-            return {"inch_txt": text, "meters_str": ""}
+            return text  # 无法解析，原样返回
         feet   = int(m.group(1)) if m.group(1) else 0
         inches = int(m.group(2)) if m.group(2) else 0
         num    = int(m.group(3)) if m.group(3) else 0
@@ -152,8 +150,9 @@ def convert_length_text(text: str) -> dict[str, str]:
     frac_txt = frac_map.get((num, den), f"{num}/{den}") if den else ''
     inch_txt = f'{inches}{frac_txt}"'
 
-    return {"feet_inch_txt" : frac_txt + inch_txt, "meters_str": meters_str}
-
+    #return f"{feet}' {inch_txt} ↦ {meters_str} m"
+    return {"feet_inch_text": f"{feet}' {inch_txt}" , "meters_text": meters_str}
+ 
 
 def convert_bearing_text(text: str) -> dict[str, str]:
     """
@@ -165,8 +164,6 @@ def convert_bearing_text(text: str) -> dict[str, str]:
     "15 5" -> "15° 05′ 00″ ∢ 15.083°"
     "0 5 3" -> "00° 05′ 03″ ∢ 0.084°"
     """  
-    from decimal import Decimal, getcontext
-
     # 分隔并解析
     parts = text.strip().split()
     try:
@@ -195,11 +192,10 @@ def convert_bearing_text(text: str) -> dict[str, str]:
         dms_str = f"{d_str}° {m_str}′ {s_str}″"
         deg_str = f"{deg:.3f}"
 
-        return {"dms_str": dms_str, "deg_str": deg_str}
+        return {"dms_text": dms_str, "deg_text": deg_str}
     except Exception:
-        return {"dms_str": text, "deg_str": ""}
-
-
+        return {"dms_text": text, "deg_text": ""}
+      
 
 def load_annotations(task_json: dict) -> list:
     """
@@ -268,9 +264,9 @@ def annotate_image_to_pdf(
         raw = ann.get('text', '')
 
         if label == 'Length':
-            disp = convert_length_text(raw)["feet_inch_txt"]
+            disp = convert_length_text(raw)["feet_inch_text"]
         elif label == 'Bearing':
-            disp = convert_bearing_text(raw)["dms_str"]
+            disp = convert_bearing_text(raw)["dms_text"]
         else:
             disp = raw
 
