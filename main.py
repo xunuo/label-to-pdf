@@ -301,7 +301,7 @@ def annotate_image_to_pdf(
       
         c.setFillColor(f_col)
         c.setFont('DejaVuSans', font_size*2)
-        text_y = -rh + font_size*2
+        text_y = padding
         c.drawCentredString(0, text_y, convert_length_text(raw)["meters_text"])
       
       
