@@ -152,7 +152,7 @@ def convert_length_text(text: str) -> dict[str, str]:
     frac_txt = frac_map.get((num, den), f"{num}/{den}") if den else ''
     inch_txt = f'{inches}{frac_txt}"'
 
-    return {"inch_txt": inch_txt, "meters_str": meters_str}
+    return {"feet_inch_txt" : frac_txt + inch_txt, "meters_str": meters_str}
 
 
 def convert_bearing_text(text: str) -> dict[str, str]:
@@ -268,7 +268,7 @@ def annotate_image_to_pdf(
         raw = ann.get('text', '')
 
         if label == 'Length':
-            disp = convert_length_text(raw)["inch_txt"]
+            disp = convert_length_text(raw)["feet_inch_txt"]
         elif label == 'Bearing':
             disp = convert_bearing_text(raw)["dms_str"]
         else:
