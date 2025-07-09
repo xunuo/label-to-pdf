@@ -85,7 +85,7 @@ def parse_html_color(color_val, alpha=None):
         raise ValueError(f"Unknown color name: {color_val}")
 
 
-def convert_length_text(text: str) -> str:
+def convert_length_text(text: str) -> dict[str, str]:
     """
     将英尺英寸格式的文本转换为米，并格式化输出。
     支持：
@@ -96,6 +96,9 @@ def convert_length_text(text: str) -> str:
     输出示例： 5' 0" ↦ 1.524 m
     解析失败则返回原文本。
     """
+    from decimal import Decimal, getcontext
+    import re
+
     # 分数到 Unicode 的映射
     frac_map = {
         (1,2): '½', (1,3): '⅓', (2,3): '⅔',
@@ -119,7 +122,6 @@ def convert_length_text(text: str) -> str:
         if len(parts) == 3 and parts[2] != '0':
             code = parts[2]
             num, den = int(code[:-1]), int(code[-1])
-        # 后面走统一的计算/格式化
     else:
         # ——— 2. 引号/复杂格式 ———
         # 一次性抓取：英尺、英寸整数、分子、分母
@@ -132,7 +134,7 @@ def convert_length_text(text: str) -> str:
             s, re.VERBOSE
         )
         if not m:
-            return text  # 无法解析，原样返回
+            return {"inch_txt": text, "meters_str": ""}
         feet   = int(m.group(1)) if m.group(1) else 0
         inches = int(m.group(2)) if m.group(2) else 0
         num    = int(m.group(3)) if m.group(3) else 0
@@ -150,11 +152,10 @@ def convert_length_text(text: str) -> str:
     frac_txt = frac_map.get((num, den), f"{num}/{den}") if den else ''
     inch_txt = f'{inches}{frac_txt}"'
 
-    return f"{feet}' {inch_txt} ↦ {meters_str} m"
+    return {"inch_txt": inch_txt, "meters_str": meters_str}
 
-      
 
-def convert_bearing_text(text: str) -> str:
+def convert_bearing_text(text: str) -> dict[str, str]:
     """
     将度 分 秒 转换为十进制度数并格式化输出。
     示例： 30° 15′ 20.5″ = 30.256°
@@ -164,6 +165,8 @@ def convert_bearing_text(text: str) -> str:
     "15 5" -> "15° 05′ 00″ ∢ 15.083°"
     "0 5 3" -> "00° 05′ 03″ ∢ 0.084°"
     """  
+    from decimal import Decimal, getcontext
+
     # 分隔并解析
     parts = text.strip().split()
     try:
@@ -190,9 +193,12 @@ def convert_bearing_text(text: str) -> str:
         s_str = pad(int(s))
 
         dms_str = f"{d_str}° {m_str}′ {s_str}″"
-        return f"{dms_str} ∢ {deg:.3f}°"
+        deg_str = f"{deg:.3f}"
+
+        return {"dms_str": dms_str, "deg_str": deg_str}
     except Exception:
-        return text
+        return {"dms_str": text, "deg_str": ""}
+
 
 
 def load_annotations(task_json: dict) -> list:
@@ -262,9 +268,9 @@ def annotate_image_to_pdf(
         raw = ann.get('text', '')
 
         if label == 'Length':
-            disp = convert_length_text(raw)
+            disp = convert_length_text(raw)["inch_txt"]
         elif label == 'Bearing':
-            disp = convert_bearing_text(raw)
+            disp = convert_bearing_text(raw)["dms_str"]
         else:
             disp = raw
 
