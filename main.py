@@ -300,6 +300,11 @@ def annotate_image_to_pdf(
         c.rect(-bw/2, -rh, bw, bh, fill=1, stroke=1)
 
         c.setFillColor(f_col)
+        c.setFont('DejaVuSans', font_size*2)
+        text_y = -rh + font_size
+        c.drawCentredString(0, text_y, convert_length_text(raw)["meters_text"])
+      
+        c.setFillColor(f_col)
         c.setFont('DejaVuSans', font_size)
         text_y = -rh + font_size/2 - padding/2
         c.drawCentredString(0, text_y, disp)
