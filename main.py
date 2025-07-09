@@ -295,11 +295,11 @@ def annotate_image_to_pdf(
         c.setStrokeColor(stroke_col)
         c.rect(-rw/2, -rh, rw, rh, fill=1, stroke=1)
 
-        # c.setFillColor(txt_bg)
-        # c.setStrokeColor(txt_st)
-        # c.rect(-bw/2, -rh + font_size*2, bw, bh, fill=1, stroke=1)
+        c.setFillColor(txt_bg)
+        c.setStrokeColor(txt_st)
+        c.rect(-bw/2, 0, bw, rh, fill=1, stroke=0)
       
-        c.setFillColor(base_col)
+        c.setFillColor(f_col)
         c.setFont('DejaVuSans', font_size*2)
         text_y = -rh + font_size*2
         c.drawCentredString(0, text_y, convert_length_text(raw)["meters_text"])
