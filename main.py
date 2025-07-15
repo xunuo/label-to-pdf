@@ -302,9 +302,7 @@ def annotate_image_to_pdf(
     image_buffer.seek(0)
     pdf_canvas.drawImage(ImageReader(image_buffer), 0, 0, width=image_width, height=image_height)
 
-    # 设置字体大小和文字边距
-    font_size = 12
-    padding = 1
+
 
     # 构建 ID -> 关联ID 的字典（如长度和方向的配对关系）
     annotation_relation_map = {relation['from_id']: relation['to_id'] for relation in relations}
@@ -365,6 +363,10 @@ def annotate_image_to_pdf(
 
 
         if label == 'Length' :
+            
+            # 设置字体大小和文字边距
+            font_size = 12
+            padding = 1
 
             # 第二层文字 识别原始文字
             # 计算文本框尺寸
@@ -375,8 +377,8 @@ def annotate_image_to_pdf(
             # text_box_y_offset = 0
             text_box_y_offset = -box_total_height
 
-            pdf_canvas.setFillColor(parse_html_color(base_color, alpha=0.40))
-            pdf_canvas.setStrokeColor(parse_html_color(base_color, alpha=0.5))
+            pdf_canvas.setFillColor(parse_html_color(base_color, alpha=0.3))
+            pdf_canvas.setStrokeColor(parse_html_color(base_color, alpha=0.4))
             pdf_canvas.rect(-box_total_width / 2, -box_height, box_width, box_height, fill=1, stroke=0)
             # pdf_canvas.rect(-box_total_width/2 + text_width/2, -box_total_height + padding, text_width, text_height, fill=1, stroke=1)
             pdf_canvas.setFillColor(parse_html_color('white', alpha=0.8))
@@ -394,7 +396,7 @@ def annotate_image_to_pdf(
             if box_height < 30 :
                 text_box_y_offset = -box_height - box_total_height
 
-            pdf_canvas.setFillColor(parse_html_color(base_color, alpha=0.4))
+            pdf_canvas.setFillColor(parse_html_color(base_color, alpha=0.3))
             pdf_canvas.setStrokeColor(text_border_color)
             pdf_canvas.rect(-box_total_width / 2, text_box_y_offset, box_total_width, box_total_height, fill=1, stroke=1)
             pdf_canvas.setFillColor(parse_html_color('white', alpha=0.8))
