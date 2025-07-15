@@ -85,6 +85,9 @@ def parse_html_color(color_val, alpha=None):
         raise ValueError(f"Unknown color name: {color_val}")
 
 
+import re
+from decimal import Decimal, getcontext
+
 def convert_length_text(text: str) -> dict[str, str]:
     """
     将英尺英寸格式的文本转换为米，并格式化输出。
@@ -108,20 +111,24 @@ def convert_length_text(text: str) -> dict[str, str]:
     INCH_TO_M = Decimal('0.0254')
 
     s = text.strip()
-
-    # ——— 1. 纯数字/三段简写 ———
     parts = s.replace('"','').split()
     show_inches = False
+    feet = inches = num = den = 0
+
+    # ——— 1. 纯数字/三段简写 ———
     if 1 <= len(parts) <= 3 and all(p.isdigit() for p in parts):
         feet = int(parts[0])
         inches = int(parts[1]) if len(parts) >= 2 else 0
         show_inches = len(parts) >= 2
-        num = den = 0
-        if len(parts) == 3 and parts[2] != '0':
+        if len(parts) == 3:
             code = parts[2]
-            num, den = int(code[:-1]), int(code[-1])
+            if len(code) >= 2 and code != '0':
+                try:
+                    num, den = int(code[:-1]), int(code[-1])
+                except ValueError:
+                    return text  # 不合法，原样返回
     else:
-        # ——— 2. 引号/复杂格式 ———
+        # ——— 2. 标准格式 ———
         m = re.match(
             r"""^\s*
                 (?:(\d+)\s*')?            # group1: feet
@@ -130,13 +137,24 @@ def convert_length_text(text: str) -> dict[str, str]:
                 \s*"?\s*$""",
             s, re.VERBOSE
         )
-        if not m:
-            return text
-        feet   = int(m.group(1)) if m.group(1) else 0
-        inches = int(m.group(2)) if m.group(2) else 0
-        num    = int(m.group(3)) if m.group(3) else 0
-        den    = int(m.group(4)) if m.group(4) else 0
-        show_inches = m.group(2) is not None 
+        if m:
+            feet   = int(m.group(1)) if m.group(1) else 0
+            inches = int(m.group(2)) if m.group(2) else 0
+            num    = int(m.group(3)) if m.group(3) else 0
+            den    = int(m.group(4)) if m.group(4) else 0
+            show_inches = m.group(2) is not None
+        else:
+            # ——— 3. 只含分数，如 "1/2" 或 ' 3 / 4 "' ———
+            m2 = re.match(
+                r"""^\s*(\d+)\s*/\s*(\d+)\s*"?\s*$""",
+                s
+            )
+            if m2:
+                num, den = int(m2.group(1)), int(m2.group(2))
+                feet = inches = 0
+                show_inches = True  # 显式保留
+            else:
+                return text  # 无法解析，返回原文本
 
     # ——— 统一计算米值 ———
     total_m = (
@@ -146,7 +164,7 @@ def convert_length_text(text: str) -> dict[str, str]:
     )
     meters_str = f"{total_m:.3f}"
 
-    # ——— 构造输出中的分数字符 & 英寸文本 ———
+    # ——— 构造英寸文本 ———
     frac_txt = frac_map.get((num, den), f"{num}/{den}") if den else ''
     if inches == 0 and frac_txt:
         inch_txt = f'{frac_txt}"'
@@ -157,7 +175,7 @@ def convert_length_text(text: str) -> dict[str, str]:
     else:
         inch_txt = ''
 
-    # ——— 构造最终输出文字 ———
+    # ——— 构造最终输出 ———
     if feet and inch_txt:
         feet_inch_text = f"{feet}' {inch_txt}"
     elif feet:
@@ -169,6 +187,7 @@ def convert_length_text(text: str) -> dict[str, str]:
         "feet_inch_text": feet_inch_text,
         "meters_text": meters_str
     }
+
 
 
 def convert_bearing_text(text: str) -> dict[str, str]:
