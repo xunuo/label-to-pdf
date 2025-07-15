@@ -393,7 +393,7 @@ def annotate_image_to_pdf(
             box_total_height = text_height + 2 * padding
             # text_box_y_offset = -box_height - padding
             text_box_y_offset = -box_height
-            if box_height < 30 :
+            if box_height < 28 :
                 text_box_y_offset = -box_height - box_total_height
 
             pdf_canvas.setFillColor(parse_html_color(base_color, alpha=0.4))
