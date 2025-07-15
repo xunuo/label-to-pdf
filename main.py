@@ -367,7 +367,6 @@ def annotate_image_to_pdf(
         pdf_canvas.setFont('DejaVuSans', font_size)
         pdf_canvas.drawCentredString(0, text_box_y_offset + padding * 3, convert_length_text(raw_text)['feet_inch_text'])
 
-
         # # 第二层文字背景框和文字(居中的)
 
         # 计算文本框尺寸
