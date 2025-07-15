@@ -410,15 +410,17 @@ def annotate_image_to_pdf(
             box_total_width = text_width + 5 * padding
             text_height = font_size
             box_total_height = text_height + 2 * padding
-            text_box_y_offset = -box_height / 2 - text_height
+            text_box_y_offset = -box_height / 2 + box_total_height
+            
+            # http://127.0.0.1:5001/download?tab=21&task=15&project=27
 
             # 第一层文字背景框和文字(居中的)
             pdf_canvas.setFillColor(parse_html_color(base_color, alpha=0.5))
             pdf_canvas.setStrokeColor(parse_html_color(base_color, alpha=0.5))
-            pdf_canvas.rect(-box_total_width / 2, text_box_y_offset + padding, box_total_width, box_total_height, fill=1, stroke=0)
+            pdf_canvas.rect(-box_total_width / 2, text_box_y_offset, box_total_width, box_total_height, fill=1, stroke=0)
             pdf_canvas.setFillColor(parse_html_color('white', alpha=0.9))
             pdf_canvas.setFont('DejaVuSans', font_size)
-            pdf_canvas.drawCentredString(0, text_box_y_offset + padding * 3, display_text)
+            pdf_canvas.drawCentredString(0, text_box_y_offset + padding*6, display_text)
 
         
 
