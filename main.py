@@ -396,7 +396,7 @@ def annotate_image_to_pdf(
             if box_height < 30 :
                 text_box_y_offset = -box_height - box_total_height
 
-            pdf_canvas.setFillColor(parse_html_color(base_color, alpha=0.3))
+            pdf_canvas.setFillColor(parse_html_color(base_color, alpha=0.4))
             pdf_canvas.setStrokeColor(text_border_color)
             pdf_canvas.rect(-box_total_width / 2, text_box_y_offset, box_total_width, box_total_height, fill=1, stroke=1)
             pdf_canvas.setFillColor(parse_html_color('white', alpha=0.8))
