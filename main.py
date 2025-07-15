@@ -148,264 +148,310 @@ def convert_length_text(text: str) -> dict[str, str]:
 
     # ——— 构造输出中的分数字符 & 英寸文本 ———
     frac_txt = frac_map.get((num, den), f"{num}/{den}") if den else ''
-    inch_txt = f'{inches}{frac_txt}"'
+    if inches == 0 and frac_txt:
+        # 只有分数
+        inch_txt = f'{frac_txt}"'
+    elif frac_txt:
+        # 英寸 + 分数
+        inch_txt = f'{inches}{frac_txt}"'
+    elif inches:
+        # 只有英寸
+        inch_txt = f'{inches}"'
+    else:
+        # 英寸+分数全 0
+        inch_txt = ''
 
-    #return f"{feet}' {inch_txt} ↦ {meters_str} m"
-    return {"feet_inch_text": f"{feet}' {inch_txt}" , "meters_text": meters_str}
- 
+    # ——— 构造最终输出文字 ———
+    if feet and inch_txt:
+        feet_inch_text = f"{feet}' {inch_txt}"
+    elif feet:
+        # 只有英尺
+        feet_inch_text = f"{feet}'"
+    else:
+        # feet = 0，直接用 inch_txt（可能是 ""、"3½\""、"½\""）
+        feet_inch_text = inch_txt
+
+    return {
+        "feet_inch_text": feet_inch_text,
+        "meters_text": meters_str
+    }
+
 
 def convert_bearing_text(text: str) -> dict[str, str]:
     """
-    将度 分 秒 转换为十进制度数并格式化输出。
-    示例： 30° 15′ 20.5″ = 30.256°
-    如果缺失度、分或秒，使用两位零补齐，比如:
-    "30" -> "30° 00′ 00″ ∢ 30.000°"
-    "" -> "00° 00′ 00″ ∢ 0.000°"
-    "15 5" -> "15° 05′ 00″ ∢ 15.083°"
-    "0 5 3" -> "00° 05′ 03″ ∢ 0.084°"
-    """  
-    # 分隔并解析
+    将度 分 秒 转换为十进制度数并格式化输出，
+    并额外返回 AutoCAD PLINE 需要的正向角度 cad_deg_text
+    以及反向角度 rev_cad_deg_text（cad_deg+180 % 360）。
+    返回 {
+      "dms_text": "DD° MM′ SS″",
+      "deg_text": "...",
+      "cad_deg_text": "...",
+      "rev_cad_deg_text": "..."
+    }
+    """
     parts = text.strip().split()
     try:
-        # 默认值
-        d = Decimal(parts[0]) if len(parts) > 0 and parts[0] != '' else Decimal(0)
+        d = Decimal(parts[0]) if parts and parts[0] else Decimal(0)
         m = Decimal(parts[1]) if len(parts) > 1 else Decimal(0)
         s = Decimal(parts[2]) if len(parts) > 2 else Decimal(0)
-        # 设置精度
         getcontext().prec = 10
-        # 计算十进制度数
-        deg = d + m / Decimal(60) + s / Decimal(3600)
-        # 格式化输出，缺失时两位零
-        def pad(value):
-            v_str = str(value)
-            # 切掉可能的小数部分，只保留整数部分的字符串
-            if v_str.isdigit():
-                if len(v_str) == 1:
-                    return '0' + v_str
-                return v_str
-            return v_str
 
-        d_str = pad(int(d))
-        m_str = pad(int(m))
-        s_str = pad(int(s))
+        # 1) 原始十进制度数
+        deg = d + m/Decimal(60) + s/Decimal(3600)
 
-        dms_str = f"{d_str}° {m_str}′ {s_str}″"
-        deg_str = f"{deg:.3f}"
+        # 2) 归一化到 [0,360)
+        deg_norm = deg % Decimal(360)
 
-        return {"dms_text": dms_str, "deg_text": deg_str}
+        # 3) 正向 CAD 角度（0°=东，逆时针为正）
+        cad_deg = (Decimal(90) - deg_norm) % Decimal(360)
+
+        # 4) 反向 CAD 角度：在正向角度上加 180°（并归一化）
+        rev_cad_deg = (cad_deg + Decimal(180)) % Decimal(360)
+
+        # 5) 构造 DMS 文本
+        def pad(v):
+            vs = str(int(v))
+            return vs.zfill(2)
+        dms_str = f"{pad(d)}° {pad(m)}′ {pad(s)}″"
+
+        return {
+            "dms_text": dms_str,
+            "deg_text":       f"{deg:.3f}",
+            "cad_deg_text":   f"{cad_deg:.3f}",
+            "rev_cad_deg_text": f"{rev_cad_deg:.3f}"
+        }
     except Exception:
-        return {"dms_text": text, "deg_text": ""}
-      
+        # 出错时也返回四个字段，保证调用处不报 KeyError
+        return {
+            "dms_text": text,
+            "deg_text": "",
+            "cad_deg_text": "",
+            "rev_cad_deg_text": ""
+        }
 
-def load_annotations(task_json: dict) -> list:
+
+def load_annotations(task_json: dict) -> tuple[list, list]:
     """
-    从 Label Studio 的 task JSON 中提取所有矩形/多边形标注及其文本/标签。
-    返回列表，每项：{'type','value','text','label'}
+    从 Task JSON 提取标注与关系。
+    返回 (annotations, relations)。
     """
-    annotations = []
+    annotations, relations = [], []
     rect_map, text_map, label_map = {}, {}, {}
     results = task_json.get('annotations', [{}])[0].get('result', [])
     for item in results:
-        eid = item['id']
-        t = item['type']
+        if item.get('type') == 'relation':
+            relations.append({'from_id': item['from_id'], 'to_id': item['to_id']})
+            continue
+        if 'id' not in item:
+            continue
+        eid, t = item['id'], item['type']
         if t in ('rectangle', 'polygon'):
             rect_map[eid] = item['value']
         elif t == 'labels':
             labs = item['value'].get('labels', [])
-            if labs:
-                label_map[eid] = labs[0]
+            if labs: label_map[eid] = labs[0]
         elif t == 'textarea':
             text_map[eid] = ''.join(item['value'].get('text', []))
     for eid, val in rect_map.items():
-        annotations.append({
-            'type': 'rectangle',
-            'value': val,
-            'text': text_map.get(eid, ''),
-            'label': label_map.get(eid)
-        })
-    return annotations
+        annotations.append({'id': eid, 'type': 'rectangle', 'value': val,
+                            'text': text_map.get(eid, ''), 'label': label_map.get(eid)})
+    return annotations, relations
 
 
 def annotate_image_to_pdf(
     image: Image.Image,
     annotations: list,
+    relations: list,
     output_buffer: BytesIO,
     color_map: dict,
     pdf_title: str
 ):
-    """
-    将图像和标注绘制到 PDF，并设置 PDF 标题(metadata)。
-    """
-    w, h = image.size
-    # 防止过大导致内存问题，限制最大边
-    max_dim = 6000
-    if max(w, h) > max_dim:
-        ratio = max_dim / max(w, h)
-        image = image.resize((int(w * ratio), int(h * ratio)), Image.LANCZOS)
-        w, h = image.size
+    # 获取图像原始宽高
+    image_width, image_height = image.size
 
-    c = canvas.Canvas(output_buffer, pagesize=(w, h), pageCompression=True)
-    c.setTitle(pdf_title)
+    # 限制最大图像尺寸，防止太大导致PDF异常
+    max_dimension = 6000
+    if max(image_width, image_height) > max_dimension:
+        resize_ratio = max_dimension / max(image_width, image_height)
+        image = image.resize(
+            (int(image_width * resize_ratio), int(image_height * resize_ratio)), 
+            Image.LANCZOS
+        )
+        image_width, image_height = image.size
 
-    # 绘制底图
-    img_buf = BytesIO()
-    image.save(img_buf, format='JPEG', quality=80, optimize=True)
-    img_buf.seek(0)
-    c.drawImage(ImageReader(img_buf), 0, 0, width=w, height=h)
+    # 创建 PDF 画布
+    pdf_canvas = canvas.Canvas(output_buffer, pagesize=(image_width, image_height), pageCompression=True)
+    pdf_canvas.setTitle(pdf_title)
 
-    font_size = 10
-    padding = font_size * 0.2
+    # 将原始图像绘制到PDF底层
+    image_buffer = BytesIO()
+    image.save(image_buffer, format='JPEG', quality=80, optimize=True)
+    image_buffer.seek(0)
+    pdf_canvas.drawImage(ImageReader(image_buffer), 0, 0, width=image_width, height=image_height)
 
-    for ann in annotations:
-        if ann['type'] not in ('rectangle', 'polygon'):
+    # 设置字体大小和文字边距
+    font_size = 12
+    padding = 15 * 0.2
+
+    # 构建 ID -> 关联ID 的字典（如长度和方向的配对关系）
+    annotation_relation_map = {relation['from_id']: relation['to_id'] for relation in relations}
+
+    for annotation in annotations:
+        # 只处理矩形和多边形类型的标注
+        if annotation['type'] not in ('rectangle', 'polygon'):
             continue
-        val = ann['value']
-        label = ann.get('label')
-        raw = ann.get('text', '')
 
+        raw_text = annotation['text']
+        label = annotation['label']
+
+        # 根据类型转换文本，如长度单位或角度
         if label == 'Length':
-            disp = convert_length_text(raw)["feet_inch_text"]
+            display_text = convert_length_text(raw_text)['meters_text']
         elif label == 'Bearing':
-            disp = convert_bearing_text(raw)["dms_text"]
+            display_text = convert_bearing_text(raw_text)['deg_text']
         else:
-            disp = raw
+            display_text = raw_text
 
-        base_col = color_map.get(label, '#00ff00')
-        fill_col = parse_html_color(base_col, alpha=0.15)
-        stroke_col = parse_html_color(base_col, alpha=0.5)
-        txt_bg = parse_html_color(base_col, alpha=0.4)
-        txt_st = parse_html_color(base_col, alpha=0.5)
-        f_col = parse_html_color('white', alpha=0.8)
+        # 如果是长度且有关联的方向信息，拼接方向信息
+        if label == 'Length' and annotation['id'] in annotation_relation_map:
+            bearing_id = annotation_relation_map[annotation['id']]
+            bearing_annotation = next(
+                (a for a in annotations if a['id'] == bearing_id and a['label'] == 'Bearing'),
+                None
+            )
+            if bearing_annotation:
+                bearing_text = convert_bearing_text(bearing_annotation['text'])['deg_text']
+                display_text = f"@{display_text}<{bearing_text}"
 
-        xc = val['x'] / 100 * w
-        yc = h - (val['y'] / 100 * h)
-        rw = val['width'] / 100 * w
-        rh = val['height'] / 100 * h
+        # 获取颜色设置（含透明度）
+        base_color = color_map.get(label, '#00ff00')
+        fill_color = parse_html_color(base_color, alpha=0.15)
+        border_color = parse_html_color(base_color, alpha=0.5)
+        text_bg_color = parse_html_color(base_color, alpha=0.6)
+        text_border_color = parse_html_color(base_color, alpha=0.5)
+        font_color = parse_html_color('white', alpha=0.8)
+        font_color2 = parse_html_color('white', alpha=0.9)
 
-        tw = stringWidth(disp, 'DejaVuSans', font_size)
-        bw = max(tw + 2*padding, rw)
-        bh = font_size + 2*padding
+        # 解析位置和大小百分比为实际坐标
+        value = annotation['value']
+        center_x = value['x'] / 100 * image_width
+        center_y = image_height - (value['y'] / 100 * image_height)
+        box_width = value['width'] / 100 * image_width
+        box_height = value['height'] / 100 * image_height
+        rotation = -value.get('rotation', 0)  # 注意是负值
 
-        c.saveState()
-        c.translate(xc, yc)
-        c.rotate(-val.get('rotation', 0))
-        c.translate(rw/2, 0)
+        # 计算文本框尺寸
+        text_width = stringWidth(convert_length_text(raw_text)['feet_inch_text'], 'DejaVuSans', font_size)
+        text_height = font_size
+        box_total_width = text_width + 2 * padding
+        box_total_height = text_height + 2 * padding
+        text_box_y_offset = -box_height / 2 - text_height
 
-        c.setFillColor(fill_col)
-        c.setStrokeColor(stroke_col)
-        c.rect(-rw/2, -rh, rw, rh, fill=1, stroke=1)
+        # 保存当前画布状态以便恢复
+        pdf_canvas.saveState()
+        pdf_canvas.translate(center_x, center_y)
+        pdf_canvas.rotate(rotation)
+        pdf_canvas.translate(box_width / 2, 0)
 
-      
-        c.setFillColor(txt_bg)
-        c.setStrokeColor(txt_st)
-        c.rect(-bw/2, -rh, bw, bh, fill=1, stroke=1)
-      
-        c.setFillColor(f_col)
-        c.setFont('DejaVuSans', font_size)
-        text_y = -rh + font_size/2 - padding/2
-        c.drawCentredString(0, text_y, '<' + disp)
-
-
-        # 主体文字
-        c.setFillColor(txt_bg)
-        c.setStrokeColor(txt_st)
-        c.rect(-bw/2, -rh, bw, rh, fill=1, stroke=0)
-      
-        c.setFillColor(f_col)
-        c.setFont('DejaVuSans', font_size*2)
-        text_y = -font_size*2 + padding*2
-        c.drawCentredString(0, text_y, '@' + convert_length_text(raw)["meters_text"])
-
-      
-        c.restoreState()
-
-    c.showPage()
-    c.save()
+        # 绘制主标注矩形区域（透明背景）
+        pdf_canvas.setFillColor(fill_color)
+        pdf_canvas.setStrokeColor(border_color)
+        pdf_canvas.rect(-box_width / 2, -box_height, box_width, box_height, fill=1, stroke=1)
 
 
-# -------------------------------
-# 路由定义
-# -------------------------------
+        # 第一层文字背景框和文字(居中的)
+        pdf_canvas.setFillColor(parse_html_color(base_color, alpha=0.01))
+        pdf_canvas.setStrokeColor(parse_html_color(base_color, alpha=0.01))
+        pdf_canvas.rect(-box_total_width / 2, text_box_y_offset + padding, box_total_width, box_total_height, fill=1, stroke=0)
+        pdf_canvas.setFillColor(parse_html_color('white', alpha=0.01))
+        pdf_canvas.setFont('DejaVuSans', font_size)
+        pdf_canvas.drawCentredString(0, text_box_y_offset + padding * 3, convert_length_text(raw_text)['feet_inch_text'])
+
+
+        # # 第二层文字背景框和文字(居中的)
+
+        # 计算文本框尺寸
+        text_width = stringWidth(convert_length_text(raw_text)['feet_inch_text'], 'DejaVuSans', font_size)
+        text_height = font_size
+        box_total_width = max(text_width + 2 * padding, box_width)
+        box_total_height = text_height + 2 * padding
+        text_box_y_offset = -box_height - padding
+
+        pdf_canvas.setFillColor(text_bg_color)
+        pdf_canvas.setStrokeColor(text_border_color)
+        pdf_canvas.rect(-box_total_width / 2, 0, box_total_width, box_total_height, fill=1, stroke=1)
+        pdf_canvas.setFillColor(font_color2)
+        pdf_canvas.setFont('DejaVuSans', font_size)
+        pdf_canvas.drawCentredString(0, padding*1.5, convert_length_text(raw_text)['feet_inch_text'])
+
+
+
+        # 第三层文字
+        
+        # 计算文本框尺寸
+        text_width = stringWidth(display_text, 'DejaVuSans', font_size)
+        text_height = font_size
+        box_total_width = max(text_width + 2 * padding, box_width)
+        box_total_height = text_height + 2 * padding
+        text_box_y_offset = -box_height - padding
+
+        pdf_canvas.setFillColor(text_bg_color)
+        pdf_canvas.setStrokeColor(text_border_color)
+        pdf_canvas.rect(-box_total_width / 2, text_box_y_offset - text_height - padding, box_total_width, box_total_height, fill=1, stroke=1)
+        pdf_canvas.setFillColor(font_color2)
+        pdf_canvas.setFont('DejaVuSans', font_size)
+        pdf_canvas.drawCentredString(0, text_box_y_offset - text_height + padding*0.5, display_text)
+
+        # 恢复画布状态（防止旋转影响下一个标注）
+        pdf_canvas.restoreState()
+
+    # 保存 PDF 页面
+    pdf_canvas.showPage()
+    pdf_canvas.save()
+
 @app.route('/')
 def index():
-    """根路径：欢迎信息"""
     return jsonify({"message": "Welcome to Xu's Label Studio PDF Exportor 🚅"})
-
 
 @app.route('/download')
 def download():
-    """
-    下载入口：
-    - 获取项目与任务
-    - 转换 updated_at 为悉尼时间
-    - 构造 metadata title
-    - 生成 PDF 并返回
-    """
-    project_id = request.args.get('project')
-    task_id = request.args.get('task')
+    project_id = request.args.get('project'); task_id = request.args.get('task')
     if not project_id or not task_id:
         return jsonify({"error": "请通过 ?project=<id>&task=<id> 指定参数"}), 400
-
     headers = {'Authorization': f"Token {LABEL_STUDIO_TOKEN}"}
-
-    # 获取项目名称
-    project_resp = requests.get(f"{LABEL_STUDIO_HOST}/api/projects/{project_id}", headers=headers)
-    project_resp.raise_for_status()
-    project_data = project_resp.json()
-    project_title = project_data.get('title', f'project_{project_id}')
-
-    # 获取任务信息
-    task_resp = requests.get(f"{LABEL_STUDIO_HOST}/api/tasks/{task_id}", headers=headers)
-    task_resp.raise_for_status()
-    task_data = task_resp.json()
-
-    # 解析并转换 updated_at 到悉尼时区
-    updated_at = task_data.get('updated_at')
+    proj = requests.get(f"{LABEL_STUDIO_HOST}/api/projects/{project_id}", headers=headers)
+    proj.raise_for_status(); pd = proj.json(); title = pd.get('title', f'project_{project_id}')
+    task = requests.get(f"{LABEL_STUDIO_HOST}/api/tasks/{task_id}", headers=headers)
+    task.raise_for_status(); td = task.json()
+    # 时间转换
+    updated = td.get('updated_at')
     try:
-        dt = parser.isoparse(updated_at)
-        if dt.tzinfo is None:
-            dt = dt.replace(tzinfo=tz.tzutc())
-        dt_sydney = dt.astimezone(SYDNEY_TZ)
-        timestamp = dt_sydney.strftime('%Y-%m-%d %H:%M:%S')
+        dt = parser.isoparse(updated);
+        if dt.tzinfo is None: dt = dt.replace(tzinfo=tz.tzutc())
+        ts = dt.astimezone(SYDNEY_TZ).strftime('%Y-%m-%d %H:%M:%S')
     except Exception:
-        timestamp = updated_at
-
-    # 构造 PDF title metadata（含时间）
-    pdf_title = f"{project_title} / Task ID: {task_id} / Last Modified (Sydney Time): {timestamp}"
-    # 构造下载文件名（不含时间）
-    download_filename = f"{project_title}[task-{task_id}].pdf"
-
-    # 下载并打开图像
-    ocr_path = task_data.get('data', {}).get('ocr')
-    if not ocr_path:
+        ts = updated
+    pdf_title = f"{title} / Task ID: {task_id} / Last Modified (Sydney Time): {ts}"
+    fname = f"{title}[task-{task_id}].pdf"
+    ocr = td.get('data',{}).get('ocr')
+    if not ocr:
         return jsonify({"error": "Task JSON 中未找到 data['ocr']"}), 500
-    img_resp = requests.get(f"{LABEL_STUDIO_HOST}{ocr_path}", headers=headers)
-    img_resp.raise_for_status()
-    image = Image.open(BytesIO(img_resp.content)).convert('RGB')
-
-    # 加载标注和颜色映射
-    annotations = load_annotations(task_data)
-    color_map = {
-        lbl: attrs.get('background', '#00ff00')
-        for lbl, attrs in project_data
-                                .get('parsed_label_config', {})
-                                .get('label', {})
-                                .get('labels_attrs', {})
-                                .items()
-    }
-
-    # 生成 PDF
+    img = requests.get(f"{LABEL_STUDIO_HOST}{ocr}", headers=headers)
+    img.raise_for_status(); image = Image.open(BytesIO(img.content)).convert('RGB')
+    annotations, relations = load_annotations(td)
+    color_map = {lbl: attrs.get('background', '#00ff00')
+                 for lbl, attrs in pd.get('parsed_label_config', {}).get('label', {}).get('labels_attrs', {}).items()}
     buf = BytesIO()
-    annotate_image_to_pdf(image, annotations, buf, color_map, pdf_title)
+    annotate_image_to_pdf(image, annotations, relations, buf, color_map, pdf_title)
     buf.seek(0)
-
-    return send_file(
-        buf,
-        as_attachment=True,
-        download_name=download_filename,
-        mimetype='application/pdf'
-    )
-
+    return send_file(buf, as_attachment=True, download_name=fname, mimetype='application/pdf')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.getenv('PORT', 5000)), debug=True)
+
+
+
+## Debug URLs
+# http://127.0.0.1:5001/download?tab=21&task=14&project=27
+# http://127.0.0.1:5001/download?task=7&project=21
+# http://127.0.0.1:5001/download?tab=18&task=9&project=22
