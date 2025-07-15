@@ -364,44 +364,82 @@ def annotate_image_to_pdf(
 
         if label == 'Length' :
             
+
             # 设置字体大小和文字边距
             font_size = 12
             padding = 1
 
-            # 第二层文字 识别原始文字
-            # 计算文本框尺寸
-            text_width = stringWidth(convert_length_text(raw_text)['feet_inch_text'], 'DejaVuSans', font_size)
-            text_height = font_size
-            box_total_width = max(text_width + 2 * padding, box_width)
-            box_total_height = text_height + 2 * padding
-            # text_box_y_offset = 0
-            text_box_y_offset = -box_total_height
 
-            pdf_canvas.setFillColor(parse_html_color(base_color, alpha=0.3))
-            pdf_canvas.setStrokeColor(parse_html_color(base_color, alpha=0.4))
-            pdf_canvas.rect(-box_total_width / 2, -box_height, box_width, box_height, fill=1, stroke=0)
-            # pdf_canvas.rect(-box_total_width/2 + text_width/2, -box_total_height + padding, text_width, text_height, fill=1, stroke=1)
-            pdf_canvas.setFillColor(parse_html_color('white', alpha=0.8))
-            pdf_canvas.setFont('DejaVuSans', font_size)
-            pdf_canvas.drawCentredString(0, text_box_y_offset, convert_length_text(raw_text)['feet_inch_text'])
+            if box_height < 26 :
+                # 第二层文字 识别原始文字
+                # 计算文本框尺寸
+                display_text = convert_length_text(raw_text)['feet_inch_text'] + '↦' + display_text
+                font_size=10
+                text_width = stringWidth(display_text, 'DejaVuSans', font_size)
+                text_height = font_size
+                box_total_width = max(text_width + 2 * padding, box_width)
+                box_total_height = text_height + 2 * padding
+                # text_box_y_offset = 0
+                text_box_y_offset = -box_total_height
 
-            # 第三层文字 米换算值
-            # 计算文本框尺寸
-            text_width = stringWidth(display_text, 'DejaVuSans', font_size)
-            text_height = font_size
-            box_total_width = max(text_width + 2 * padding, box_width)
-            box_total_height = text_height + 2 * padding
-            # text_box_y_offset = -box_height - padding
-            text_box_y_offset = -box_height
-            if box_height < 28 :
-                text_box_y_offset = -box_height - box_total_height
+                # pdf_canvas.setFillColor(parse_html_color(base_color, alpha=0.3))
+                # pdf_canvas.setStrokeColor(parse_html_color(base_color, alpha=0.4))
+                # pdf_canvas.rect(-box_total_width / 2, -box_height, box_width, box_height, fill=1, stroke=0)
+                # # pdf_canvas.rect(-box_total_width/2 + text_width/2, -box_total_height + padding, text_width, text_height, fill=1, stroke=1)
+                # pdf_canvas.setFillColor(parse_html_color('green', alpha=0.8))
+                # pdf_canvas.setFont('DejaVuSans', font_size)
+                # pdf_canvas.drawCentredString(text_width, text_box_y_offset, convert_length_text(raw_text)['feet_inch_text'])
 
-            pdf_canvas.setFillColor(parse_html_color(base_color, alpha=0.4))
-            pdf_canvas.setStrokeColor(text_border_color)
-            pdf_canvas.rect(-box_total_width / 2, text_box_y_offset, box_total_width, box_total_height, fill=1, stroke=1)
-            pdf_canvas.setFillColor(parse_html_color('white', alpha=0.8))
-            pdf_canvas.setFont('DejaVuSans', font_size)
-            pdf_canvas.drawCentredString(0, text_box_y_offset + padding*3, display_text)
+                # 第三层文字 米换算值
+                # 计算文本框尺寸
+                text_width = stringWidth(display_text, 'DejaVuSans', font_size)
+                text_height = font_size
+                box_total_width = max(text_width + 2 * padding, box_width)
+                box_total_height = text_height + 2 * padding
+                # text_box_y_offset = -box_height - padding
+                text_box_y_offset = -box_height
+
+                pdf_canvas.setFillColor(parse_html_color(base_color, alpha=0.4))
+                pdf_canvas.setStrokeColor(text_border_color)
+                pdf_canvas.rect(-box_total_width / 2, text_box_y_offset, box_total_width, box_total_height, fill=1, stroke=1)
+                pdf_canvas.setFillColor(parse_html_color('white', alpha=0.7))
+                pdf_canvas.setFont('DejaVuSans', font_size)
+                pdf_canvas.drawCentredString(0, text_box_y_offset + padding*3, display_text)
+
+            else :
+
+                # 第二层文字 识别原始文字
+                # 计算文本框尺寸
+                text_width = stringWidth(convert_length_text(raw_text)['feet_inch_text'], 'DejaVuSans', font_size)
+                text_height = font_size
+                box_total_width = max(text_width + 2 * padding, box_width)
+                box_total_height = text_height + 2 * padding
+                # text_box_y_offset = 0
+                text_box_y_offset = -box_total_height
+
+                pdf_canvas.setFillColor(parse_html_color(base_color, alpha=0.2))
+                pdf_canvas.setStrokeColor(parse_html_color(base_color, alpha=0.3))
+                pdf_canvas.rect(-box_total_width / 2, -box_height, box_width, box_height, fill=1, stroke=0)
+                # pdf_canvas.rect(-box_total_width/2 + text_width/2, -box_total_height + padding, text_width, text_height, fill=1, stroke=1)
+                pdf_canvas.setFillColor(parse_html_color('white', alpha=0.85))
+                pdf_canvas.setFont('DejaVuSans', font_size)
+                pdf_canvas.drawCentredString(0, text_box_y_offset + padding*3, convert_length_text(raw_text)['feet_inch_text'])
+
+                # 第三层文字 米换算值
+                # 计算文本框尺寸
+                text_width = stringWidth(display_text, 'DejaVuSans', font_size)
+                text_height = font_size
+                box_total_width = max(text_width + 2 * padding, box_width)
+                box_total_height = text_height + 2 * padding
+                # text_box_y_offset = -box_height - padding
+                text_box_y_offset = -box_height
+
+                pdf_canvas.setFillColor(parse_html_color(base_color, alpha=0.4))
+                pdf_canvas.setStrokeColor(text_border_color)
+                pdf_canvas.rect(-box_total_width / 2, text_box_y_offset, box_total_width, box_total_height, fill=1, stroke=1)
+                pdf_canvas.setFillColor(parse_html_color('white', alpha=0.8))
+                pdf_canvas.setFont('DejaVuSans', font_size)
+                pdf_canvas.drawCentredString(0, text_box_y_offset + padding*3, display_text)
 
         else:
             
