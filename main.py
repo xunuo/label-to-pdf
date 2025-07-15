@@ -96,7 +96,6 @@ def convert_length_text(text: str) -> dict[str, str]:
     输出示例： 5' 0" ↦ 1.524 m
     解析失败则返回原文本。
     """
-    # 分数到 Unicode 的映射
     frac_map = {
         (1,2): '½', (1,3): '⅓', (2,3): '⅔',
         (1,4): '¼', (3,4): '¾',
@@ -112,17 +111,17 @@ def convert_length_text(text: str) -> dict[str, str]:
 
     # ——— 1. 纯数字/三段简写 ———
     parts = s.replace('"','').split()
+    show_inches = False
     if 1 <= len(parts) <= 3 and all(p.isdigit() for p in parts):
         feet = int(parts[0])
         inches = int(parts[1]) if len(parts) >= 2 else 0
+        show_inches = len(parts) >= 2
         num = den = 0
         if len(parts) == 3 and parts[2] != '0':
             code = parts[2]
             num, den = int(code[:-1]), int(code[-1])
-        # 后面走统一的计算/格式化
     else:
         # ——— 2. 引号/复杂格式 ———
-        # 一次性抓取：英尺、英寸整数、分子、分母
         m = re.match(
             r"""^\s*
                 (?:(\d+)\s*')?            # group1: feet
@@ -132,11 +131,12 @@ def convert_length_text(text: str) -> dict[str, str]:
             s, re.VERBOSE
         )
         if not m:
-            return text  # 无法解析，原样返回
+            return text
         feet   = int(m.group(1)) if m.group(1) else 0
         inches = int(m.group(2)) if m.group(2) else 0
         num    = int(m.group(3)) if m.group(3) else 0
         den    = int(m.group(4)) if m.group(4) else 0
+        show_inches = m.group(2) is not None 
 
     # ——— 统一计算米值 ———
     total_m = (
@@ -149,26 +149,20 @@ def convert_length_text(text: str) -> dict[str, str]:
     # ——— 构造输出中的分数字符 & 英寸文本 ———
     frac_txt = frac_map.get((num, den), f"{num}/{den}") if den else ''
     if inches == 0 and frac_txt:
-        # 只有分数
         inch_txt = f'{frac_txt}"'
     elif frac_txt:
-        # 英寸 + 分数
         inch_txt = f'{inches}{frac_txt}"'
-    elif inches:
-        # 只有英寸
+    elif inches or show_inches:
         inch_txt = f'{inches}"'
     else:
-        # 英寸+分数全 0
         inch_txt = ''
 
     # ——— 构造最终输出文字 ———
     if feet and inch_txt:
         feet_inch_text = f"{feet}' {inch_txt}"
     elif feet:
-        # 只有英尺
         feet_inch_text = f"{feet}'"
     else:
-        # feet = 0，直接用 inch_txt（可能是 ""、"3½\""、"½\""）
         feet_inch_text = inch_txt
 
     return {
