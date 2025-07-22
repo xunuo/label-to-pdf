@@ -367,7 +367,7 @@ def annotate_image_to_pdf(
             font_size = 12
             padding = box_height/30
 
-            if box_height < 26 :
+            if box_height < 1 :
                 # 第二层文字 识别原始文字
                 # 计算文本框尺寸
                 display_text = convert_length_text(raw_text)['feet_inch_text'] + '↦' + display_text
@@ -446,7 +446,7 @@ def annotate_image_to_pdf(
             padding = box_height/30
 
 
-            if box_height < 26 :
+            if box_height < 1 :
                 # 第二层文字 识别原始文字
                 # 计算文本框尺寸
                 font_size=10
