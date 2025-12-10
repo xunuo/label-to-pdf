@@ -563,8 +563,8 @@ def download():
         ts = dt.astimezone(SYDNEY_TZ).strftime('%Y-%m-%d %H:%M:%S')
     except Exception:
         ts = updated
-    pdf_title = f"{title} / Task ID: {task_id} / Last Modified (Sydney Time): {ts}"
-    fname = f"{title}[task-{task_id}].pdf"
+    pdf_title = f"{title}(unit-converted) / Task ID: {task_id} / Last Modified (Sydney Time): {ts}"
+    fname = f"{title}(unit-converted).pdf"
     ocr = td.get('data',{}).get('ocr')
     if not ocr:
         return jsonify({"error": "Task JSON 中未找到 data['ocr']"}), 500
